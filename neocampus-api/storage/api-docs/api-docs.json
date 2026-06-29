@@ -1,0 +1,40 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "NeoCampus API Documentation",
+        "description": "API documentation for the NeoCampus school management web platform",
+        "contact": {
+            "email": "admin@neocampus.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "NeoCampus API Server"
+        }
+    ],
+    "paths": {
+        "/admin/eleves": {
+            "get": {
+                "summary": "Get list of students (Dummy)",
+                "operationId": "7d182e78ad8280cfe629ca2522e62719",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format: Bearer <token>",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    }
+}
