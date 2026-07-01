@@ -7,4 +7,6 @@ export interface User {
   prenom: string;
   email: string;
   role: UserRole;
+  avatar?: string | null;
+  temp_password?: string | null;
 }

@@ -25,7 +25,7 @@ import {
   TrendingUp,
   CreditCard
 } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -99,12 +99,13 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           nameKey: 'pedagogy',
           icon: BookOpen,
           hasSubmenu: true,
-          gridCols: 'grid-cols-2',
+          gridCols: 'grid-cols-3',
           items: [
             { nameKey: 'submenu_classes', path: '/admin/classes', icon: BookMarked },
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
+            { nameKey: 'submenu_salaries', path: '/teacher/salaires', icon: FileText },
           ]
         },
         { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
@@ -112,7 +113,7 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
       ];
     case 'admin':
       return [
-        { id: 'users', nameKey: 'users', icon: Users, hasSubmenu: false, path: '/admin/students' },
+        { id: 'users', nameKey: 'users', icon: Users, hasSubmenu: false, path: '/admin/users' },
         {
           id: 'pedagogy',
           nameKey: 'pedagogy',
@@ -121,13 +122,14 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           gridCols: 'grid-cols-3',
           items: [
             { nameKey: 'submenu_classes', path: '/admin/classes', icon: BookMarked },
+            { nameKey: 'submenu_teachers', path: '/admin/teachers', icon: GraduationCap },
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
             { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
           ]
         },
-        { id: 'analytics', nameKey: 'analytics', icon: BarChart3, hasSubmenu: false, path: '/finance' },
+        { id: 'analytics', nameKey: 'submenu_salaries', icon: CreditCard, hasSubmenu: false, path: '/finance/salaires' },
         { id: 'communication', nameKey: 'communication', icon: MessageSquare, hasSubmenu: false, path: '/chatbot' },
         { id: 'transport', nameKey: 'transport', icon: Bus, hasSubmenu: false, path: '/transport' },
       ];
@@ -135,6 +137,7 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
       return [
         { id: 'frais', nameKey: 'fees_setup', icon: Settings, hasSubmenu: false, path: '/finance/fees' },
         { id: 'encaissements', nameKey: 'collections_record', icon: CreditCard, hasSubmenu: false, path: '/finance/payments' },
+        { id: 'salaires', nameKey: 'submenu_salaries', icon: CreditCard, hasSubmenu: false, path: '/finance/salaires' },
         { id: 'soldes', nameKey: 'balances_reports', icon: FileText, hasSubmenu: false, path: '/finance/reports' },
         { id: 'recettes', nameKey: 'revenues_expenses', icon: TrendingUp, hasSubmenu: false, path: '/finance/accounting' },
       ];
@@ -328,6 +331,12 @@ export const DashboardLayout: React.FC = () => {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 hover:opacity-85 transition focus:outline-none cursor-pointer">
                 <Avatar className="h-8 w-8 ring-2 ring-neutral-100">
+                  {user.avatar && (
+                    <AvatarImage
+                      src={user.avatar}
+                      alt={`${user.prenom} ${user.nom}`}
+                    />
+                  )}
                   <AvatarFallback className="bg-neutral-900 text-white text-xs font-bold uppercase">
                     {user.nom.charAt(0)}{user.prenom.charAt(0)}
                   </AvatarFallback>

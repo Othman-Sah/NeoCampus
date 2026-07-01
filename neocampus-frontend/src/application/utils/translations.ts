@@ -18,6 +18,8 @@ export const translations = {
     submenu_absence: 'Absence',
     submenu_library: 'Biblio',
     submenu_classes: 'Classes',
+    submenu_teachers: 'Teachers',
+    submenu_salaries: 'Salaries',
     submenu_timetable: 'Agenda',
 
     // Login Card
@@ -93,6 +95,32 @@ export const translations = {
     books_borrowed: 'Livres Empruntés',
     pending_tasks: 'Devoirs à faire',
     homework_list: 'Mes Devoirs à Rendre',
+    
+    // User Hub & Student Directory
+    user_hub_title: 'Espace Utilisateurs',
+    user_hub_subtitle: 'Sélectionnez le type d\'utilisateur pour gérer sa fiche',
+    student_directory: 'Annuaire des Élèves',
+    add_student: 'Nouvelle Inscription',
+    edit_student: 'Modifier l\'Élève',
+    search_student: 'Rechercher un élève...',
+    matricule: 'Matricule',
+    full_name: 'Nom Complet',
+    classe: 'Classe',
+    section: 'Niveau',
+    status: 'Statut',
+    actions: 'Actions',
+    view_profile: 'Voir la Fiche',
+    delete_student: 'Supprimer l\'Élève',
+    delete_confirm_title: 'Confirmer la suppression',
+    delete_confirm_desc: 'Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible.',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+    next: 'Suivant',
+    previous: 'Précédent',
+    confirm: 'Confirmer',
+    personal_info: 'Infos Personnelles',
+    school_info: 'Infos Scolaires',
+    parent_docs: 'Parents & Documents',
   },
   en: {
     // Navigation / Categories
@@ -111,6 +139,8 @@ export const translations = {
     submenu_absence: 'Absence',
     submenu_library: 'Library',
     submenu_classes: 'Classes',
+    submenu_teachers: 'Teachers',
+    submenu_salaries: 'Salaries',
     submenu_timetable: 'Agenda',
 
     // Login Card
@@ -186,6 +216,32 @@ export const translations = {
     books_borrowed: 'Books Borrowed',
     pending_tasks: 'Pending Tasks',
     homework_list: 'Homework Task List',
+
+    // User Hub & Student Directory
+    user_hub_title: 'Users Space',
+    user_hub_subtitle: 'Select the user type to manage directory profiles',
+    student_directory: 'Student Directory',
+    add_student: 'New Enrollment',
+    edit_student: 'Edit Student',
+    search_student: 'Search a student...',
+    matricule: 'Matricule',
+    full_name: 'Full Name',
+    classe: 'Class',
+    section: 'Section',
+    status: 'Status',
+    actions: 'Actions',
+    view_profile: 'View Profile',
+    delete_student: 'Delete Student',
+    delete_confirm_title: 'Confirm deletion',
+    delete_confirm_desc: 'Are you sure you want to delete this student? This action cannot be undone.',
+    cancel: 'Cancel',
+    save: 'Save',
+    next: 'Next',
+    previous: 'Previous',
+    confirm: 'Confirm',
+    personal_info: 'Personal Info',
+    school_info: 'School Info',
+    parent_docs: 'Parents & Docs',
   }
 };
 

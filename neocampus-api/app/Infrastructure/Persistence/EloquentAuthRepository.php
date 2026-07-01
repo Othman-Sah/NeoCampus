@@ -30,7 +30,8 @@ class EloquentAuthRepository implements AuthPortInterface
             $user->nom,
             $user->prenom,
             $user->email,
-            $user->role
+            $user->role,
+            $user->avatar
         );
 
         return new TokenDTO($token, 'Bearer', $userDTO);
@@ -55,7 +56,8 @@ class EloquentAuthRepository implements AuthPortInterface
             $user->nom,
             $user->prenom,
             $user->email,
-            $user->role
+            $user->role,
+            $user->avatar
         );
     }
 }

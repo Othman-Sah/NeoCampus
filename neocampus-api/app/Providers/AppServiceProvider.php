@@ -17,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AuthPortInterface::class, EloquentAuthRepository::class);
         $this->app->bind(StudentPortInterface::class, EloquentStudentRepository::class);
+        $this->app->bind(\App\Domain\Ports\ClassPortInterface::class, \App\Infrastructure\Persistence\EloquentClassRepository::class);
+        $this->app->bind(\App\Domain\Ports\TeacherPortInterface::class, \App\Infrastructure\Persistence\EloquentTeacherRepository::class);
+        $this->app->bind(\App\Domain\Ports\SalaryPortInterface::class, \App\Infrastructure\Persistence\EloquentSalaryRepository::class);
+        $this->app->bind(\App\Domain\Ports\SeancePortInterface::class, \App\Infrastructure\Persistence\EloquentSeanceRepository::class);
     }
 
     /**

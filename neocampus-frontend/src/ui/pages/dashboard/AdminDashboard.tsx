@@ -1,5 +1,7 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useStudent } from '@/application/useCases/useStudent'
 import { 
   Users, 
   Clock, 
@@ -15,23 +17,27 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, MiniCalendar }) => {
+  const { students } = useStudent()
+
   return (
     <div className="space-y-8 animate-fade-in text-neutral-900">
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-white border border-neutral-100 shadow-sm rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
-              {language === 'fr' ? 'Effectif Total' : 'Total Students'}
-            </span>
-            <Users className="h-4 w-4 text-neutral-400" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">847</h2>
-          <div className="flex items-center gap-1 text-[10px] font-semibold text-teal-600 mt-2">
-            <TrendingUp className="h-3 w-3" />
-            <span>{language === 'fr' ? '+12 ce mois' : '+12 this month'}</span>
-          </div>
-        </Card>
+        <Link to="/admin/students" className="block group">
+          <Card className="bg-white border border-neutral-100 shadow-sm rounded-2xl p-5 hover:border-neutral-400 hover:shadow-md transition-all duration-200 cursor-pointer">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase group-hover:text-black">
+                {language === 'fr' ? 'Effectif Total' : 'Total Students'}
+              </span>
+              <Users className="h-4 w-4 text-neutral-400 group-hover:text-black transition-colors" />
+            </div>
+            <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">{students.length}</h2>
+            <div className="flex items-center gap-1 text-[10px] font-semibold text-teal-600 mt-2">
+              <TrendingUp className="h-3 w-3" />
+              <span>{language === 'fr' ? '+12 ce mois' : '+12 this month'}</span>
+            </div>
+          </Card>
+        </Link>
 
         <Card className="bg-white border border-neutral-100 shadow-sm rounded-2xl p-5">
           <div className="flex items-center justify-between mb-2">

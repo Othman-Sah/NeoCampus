@@ -6,6 +6,20 @@ import ProtectedRoute from '@/ui/components/ProtectedRoute'
 import LoginPage from '@/ui/pages/login/LoginPage'
 import PlaceholderPage from '@/ui/pages/PlaceholderPage'
 import DashboardPage from '@/ui/pages/dashboard/DashboardPage'
+import UserHubPage from '@/ui/pages/users/UserHubPage'
+import StudentDirectoryPage from '@/ui/pages/students/StudentDirectoryPage'
+import StudentCreatePage from '@/ui/pages/students/StudentCreatePage'
+import StudentDetailsPage from '@/ui/pages/students/StudentDetailsPage'
+import StudentEditPage from '@/ui/pages/students/StudentEditPage'
+import StudentImportPage from '@/ui/pages/students/StudentImportPage'
+import ClassesPage from '@/ui/pages/classes/ClassesPage'
+import ClassDetailsPage from '@/ui/pages/classes/ClassDetailsPage'
+import TeachersPage from '@/ui/pages/teachers/TeachersPage'
+import TeacherCreatePage from '@/ui/pages/teachers/TeacherCreatePage'
+import TeacherEditPage from '@/ui/pages/teachers/TeacherEditPage'
+import ComptableSalaryPage from '@/ui/pages/salaires/ComptableSalaryPage'
+import TeacherSalaryPage from '@/ui/pages/salaires/TeacherSalaryPage'
+import { TimetablePage } from '@/ui/pages/timetable/TimetablePage'
 
 export const App: React.FC = () => {
   return (
@@ -20,7 +34,7 @@ export const App: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/timetable" element={<PlaceholderPage />} />
+            <Route path="/timetable" element={<TimetablePage />} />
             <Route path="/attendance" element={<PlaceholderPage />} />
             <Route path="/grades" element={<PlaceholderPage />} />
             <Route path="/announcements" element={<PlaceholderPage />} />
@@ -32,16 +46,33 @@ export const App: React.FC = () => {
         {/* Admin-only Routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/admin/students" element={<PlaceholderPage />} />
-            <Route path="/admin/teachers" element={<PlaceholderPage />} />
-            <Route path="/admin/classes" element={<PlaceholderPage />} />
+             <Route path="/admin/users" element={<UserHubPage />} />
+             <Route path="/admin/students" element={<StudentDirectoryPage />} />
+             <Route path="/admin/students/create" element={<StudentCreatePage />} />
+             <Route path="/admin/students/:id" element={<StudentDetailsPage />} />
+             <Route path="/admin/students/:id/edit" element={<StudentEditPage />} />
+             <Route path="/admin/students/import" element={<StudentImportPage />} />
+             <Route path="/admin/teachers" element={<TeachersPage />} />
+             <Route path="/admin/teachers/create" element={<TeacherCreatePage />} />
+             <Route path="/admin/teachers/:id/edit" element={<TeacherEditPage />} />
+             <Route path="/admin/accountants" element={<PlaceholderPage />} />
+             <Route path="/admin/classes" element={<ClassesPage />} />
+             <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
           </Route>
         </Route>
 
         {/* Finance-only Routes */}
         <Route element={<ProtectedRoute allowedRoles={['comptable', 'admin']} />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/finance" element={<PlaceholderPage />} />
+            <Route path="/finance" element={<Navigate to="/finance/salaires" replace />} />
+            <Route path="/finance/salaires" element={<ComptableSalaryPage />} />
+          </Route>
+        </Route>
+
+        {/* Teacher Payout view Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['enseignant', 'admin']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/teacher/salaires" element={<TeacherSalaryPage />} />
           </Route>
         </Route>
 
