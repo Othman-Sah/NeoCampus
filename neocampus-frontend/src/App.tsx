@@ -20,6 +20,12 @@ import TeacherEditPage from '@/ui/pages/teachers/TeacherEditPage'
 import ComptableSalaryPage from '@/ui/pages/salaires/ComptableSalaryPage'
 import TeacherSalaryPage from '@/ui/pages/salaires/TeacherSalaryPage'
 import { TimetablePage } from '@/ui/pages/timetable/TimetablePage'
+import { AttendanceSheetPage } from '@/ui/pages/attendance/AttendanceSheetPage'
+import { GradeEntrySheetPage } from '@/ui/pages/grades/GradeEntrySheetPage'
+import { ExamUploadWizardPage } from '@/ui/pages/exams/ExamUploadWizardPage'
+import { AdminExamManagementPage } from '@/ui/pages/exams/AdminExamManagementPage'
+import { AttendanceDashboardPage } from '@/ui/pages/attendance/AttendanceDashboardPage'
+import { GradesDashboardPage } from '@/ui/pages/grades/GradesDashboardPage'
 
 export const App: React.FC = () => {
   return (
@@ -35,8 +41,8 @@ export const App: React.FC = () => {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/timetable" element={<TimetablePage />} />
-            <Route path="/attendance" element={<PlaceholderPage />} />
-            <Route path="/grades" element={<PlaceholderPage />} />
+            <Route path="/attendance" element={<AttendanceDashboardPage />} />
+            <Route path="/grades" element={<GradesDashboardPage />} />
             <Route path="/announcements" element={<PlaceholderPage />} />
             <Route path="/bulletins" element={<PlaceholderPage />} />
             <Route path="/transport" element={<PlaceholderPage />} />
@@ -58,6 +64,7 @@ export const App: React.FC = () => {
              <Route path="/admin/accountants" element={<PlaceholderPage />} />
              <Route path="/admin/classes" element={<ClassesPage />} />
              <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
+             <Route path="/admin/exams" element={<AdminExamManagementPage />} />
           </Route>
         </Route>
 
@@ -69,10 +76,13 @@ export const App: React.FC = () => {
           </Route>
         </Route>
 
-        {/* Teacher Payout view Routes */}
+        {/* Teacher specific Routes */}
         <Route element={<ProtectedRoute allowedRoles={['enseignant', 'admin']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/teacher/salaires" element={<TeacherSalaryPage />} />
+            <Route path="/teacher/attendance/:seanceId" element={<AttendanceSheetPage />} />
+            <Route path="/teacher/grades/:examenId" element={<GradeEntrySheetPage />} />
+            <Route path="/teacher/exams/upload/:id" element={<ExamUploadWizardPage />} />
           </Route>
         </Route>
 

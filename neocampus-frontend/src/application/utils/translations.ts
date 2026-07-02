@@ -21,6 +21,7 @@ export const translations = {
     submenu_teachers: 'Teachers',
     submenu_salaries: 'Salaries',
     submenu_timetable: 'Agenda',
+    submenu_exams: 'Examens',
 
     // Login Card
     login_title: 'Connexion',
@@ -142,6 +143,7 @@ export const translations = {
     submenu_teachers: 'Teachers',
     submenu_salaries: 'Salaries',
     submenu_timetable: 'Agenda',
+    submenu_exams: 'Exams',
 
     // Login Card
     login_title: 'Login',

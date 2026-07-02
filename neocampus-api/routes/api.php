@@ -55,10 +55,50 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
 
     // Enseignant (Teacher) Routes
     Route::middleware('role:enseignant,admin')->prefix('teacher')->group(function () {
-        Route::post('/presences/bulk', function () {
-            return response()->json(['message' => 'Bulk attendance submission placeholder.']);
-        });
         Route::get('/salaires', [\App\Http\Controllers\Api\SalaryController::class, 'mySalaries']);
+    });
+
+    // --- Attendance Module (enseignant|admin) ---
+    Route::middleware('role:enseignant,admin')->group(function () {
+        Route::post('/presences/bulk', [\App\Http\Controllers\Api\PresenceController::class, 'submitBulk']);
+        Route::get('/classes/{id}/presences', [\App\Http\Controllers\Api\PresenceController::class, 'classPresences']);
+        Route::get('/classes/{id}/eleves', [\App\Http\Controllers\Api\ClassController::class, 'students']);
+        Route::get('/eleves/{id}/presences', [\App\Http\Controllers\Api\PresenceController::class, 'studentPresences']);
+        Route::get('/presences', [\App\Http\Controllers\Api\PresenceController::class, 'index']);
+        Route::put('/presences/{id}', [\App\Http\Controllers\Api\PresenceController::class, 'update']);
+    });
+
+    // --- Grades & Strict Windows Module ---
+    Route::middleware('role:enseignant,admin')->group(function () {
+        Route::post('/notes/bulk', [\App\Http\Controllers\Api\GradeController::class, 'submitBulk']);
+        Route::post('/notes/exceptions/request', [\App\Http\Controllers\Api\GradeController::class, 'requestException']);
+        Route::get('/notes/check-window/{examenId}', [\App\Http\Controllers\Api\GradeController::class, 'checkWindow']);
+        Route::get('/notes/examen/{examenId}', [\App\Http\Controllers\Api\GradeController::class, 'findByExamen']);
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/admin/notes/exceptions/{id}/approve', [\App\Http\Controllers\Api\GradeController::class, 'approveException']);
+        Route::get('/admin/notes/exceptions/pending', [\App\Http\Controllers\Api\GradeController::class, 'pendingExceptions']);
+    });
+
+    // --- Exam Scheduling & Upload Module ---
+    Route::middleware('role:enseignant,admin')->group(function () {
+        Route::post('/examens/propose-schedule', [\App\Http\Controllers\Api\ExamenController::class, 'proposeSchedule']);
+        Route::post('/examens/{id}/upload-sujet', [\App\Http\Controllers\Api\ExamenController::class, 'uploadSujet']);
+        Route::get('/examens/teacher', [\App\Http\Controllers\Api\ExamenController::class, 'teacherExams']);
+        Route::get('/parametres-examens/template', [\App\Http\Controllers\Api\ExamenController::class, 'downloadTemplate']);
+        Route::get('/parametres-examens', [\App\Http\Controllers\Api\ExamenController::class, 'getSettings']);
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/admin/examens/schedule/{id}/review', [\App\Http\Controllers\Api\ExamenController::class, 'reviewSchedule']);
+        Route::get('/admin/examens/proposals/pending', [\App\Http\Controllers\Api\ExamenController::class, 'pendingProposals']);
+        Route::post('/admin/parametres-examens', [\App\Http\Controllers\Api\ExamenController::class, 'updateSettings']);
+    });
+
+    // --- Bulletins Module ---
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/bulletins/generate', [\App\Http\Controllers\Api\BulletinController::class, 'generate']);
     });
 
     // Parent Routes

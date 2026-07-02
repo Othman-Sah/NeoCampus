@@ -122,7 +122,7 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           gridCols: 'grid-cols-3',
           items: [
             { nameKey: 'submenu_classes', path: '/admin/classes', icon: BookMarked },
-            { nameKey: 'submenu_teachers', path: '/admin/teachers', icon: GraduationCap },
+            { nameKey: 'submenu_exams', path: '/admin/exams', icon: FileText },
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },

@@ -34,6 +34,8 @@ class StudentResource extends JsonResource
             'documents' => $data['documents'] ?? null,
             'scolarite_anterieure' => $data['scolarite_anterieure'] ?? null,
             'avatar' => $data['user']['avatar'] ?? $data['avatar'] ?? null,
+            'absences_count' => \App\Models\Presence::where('eleve_id', $data['id'])->where('statut', 'absent')->count(),
+            'retards_count' => \App\Models\Presence::where('eleve_id', $data['id'])->where('statut', 'retard')->count(),
         ];
     }
 

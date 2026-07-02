@@ -74,4 +74,10 @@ class ClassController extends Controller
         $years = $this->classRepository->findAllAcademicYears();
         return response()->json(['data' => $years]);
     }
+
+    public function students(int $id): JsonResponse
+    {
+        $students = \App\Models\Eleve::where('classe_id', $id)->get();
+        return response()->json(['data' => $students]);
+    }
 }

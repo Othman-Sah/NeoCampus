@@ -86,9 +86,7 @@ export const studentApiService: IStudentService = {
 
   async findAllByClasse(classeId: number): Promise<Student[]> {
     try {
-      const response = await axiosClient.get<Student[]>(`/admin/eleves`, {
-        params: { classe_id: classeId },
-      })
+      const response = await axiosClient.get<Student[]>(`/classes/${classeId}/eleves`)
       const resData = response.data as any
       const rawList = resData && resData.data ? resData.data : resData
       return Array.isArray(rawList) ? rawList : []
