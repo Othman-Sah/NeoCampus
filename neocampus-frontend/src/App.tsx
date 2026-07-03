@@ -17,8 +17,13 @@ import ClassDetailsPage from '@/ui/pages/classes/ClassDetailsPage'
 import TeachersPage from '@/ui/pages/teachers/TeachersPage'
 import TeacherCreatePage from '@/ui/pages/teachers/TeacherCreatePage'
 import TeacherEditPage from '@/ui/pages/teachers/TeacherEditPage'
-import ComptableSalaryPage from '@/ui/pages/salaires/ComptableSalaryPage'
 import TeacherSalaryPage from '@/ui/pages/salaires/TeacherSalaryPage'
+import FeeConfigPage from '@/ui/pages/finance/FeeConfigPage'
+import FinanceStudentListPage from '@/ui/pages/finance/FinanceStudentListPage'
+import StudentPaymentView from '@/ui/pages/finance/StudentPaymentView'
+import ReportsPage from '@/ui/pages/finance/ReportsPage'
+import PayoutsPage from '@/ui/pages/finance/PayoutsPage'
+import AccountantDirectoryPage from '@/ui/pages/users/AccountantDirectoryPage'
 import { TimetablePage } from '@/ui/pages/timetable/TimetablePage'
 import { AttendanceSheetPage } from '@/ui/pages/attendance/AttendanceSheetPage'
 import { GradeEntrySheetPage } from '@/ui/pages/grades/GradeEntrySheetPage'
@@ -26,6 +31,9 @@ import { ExamUploadWizardPage } from '@/ui/pages/exams/ExamUploadWizardPage'
 import { AdminExamManagementPage } from '@/ui/pages/exams/AdminExamManagementPage'
 import { AttendanceDashboardPage } from '@/ui/pages/attendance/AttendanceDashboardPage'
 import { GradesDashboardPage } from '@/ui/pages/grades/GradesDashboardPage'
+import LibraryDashboard from '@/ui/pages/library/LibraryDashboard'
+import BookCatalog from '@/ui/pages/library/BookCatalog'
+import LoansManager from '@/ui/pages/library/LoansManager'
 
 export const App: React.FC = () => {
   return (
@@ -61,7 +69,7 @@ export const App: React.FC = () => {
              <Route path="/admin/teachers" element={<TeachersPage />} />
              <Route path="/admin/teachers/create" element={<TeacherCreatePage />} />
              <Route path="/admin/teachers/:id/edit" element={<TeacherEditPage />} />
-             <Route path="/admin/accountants" element={<PlaceholderPage />} />
+             <Route path="/admin/accountants" element={<AccountantDirectoryPage />} />
              <Route path="/admin/classes" element={<ClassesPage />} />
              <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
              <Route path="/admin/exams" element={<AdminExamManagementPage />} />
@@ -72,7 +80,11 @@ export const App: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['comptable', 'admin']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/finance" element={<Navigate to="/finance/salaires" replace />} />
-            <Route path="/finance/salaires" element={<ComptableSalaryPage />} />
+            <Route path="/finance/salaires" element={<PayoutsPage />} />
+            <Route path="/finance/fees" element={<FeeConfigPage />} />
+            <Route path="/finance/payments" element={<FinanceStudentListPage />} />
+            <Route path="/finance/students/:id/balance" element={<StudentPaymentView />} />
+            <Route path="/finance/reports" element={<ReportsPage />} />
           </Route>
         </Route>
 
@@ -89,7 +101,10 @@ export const App: React.FC = () => {
         {/* Library-only Routes */}
         <Route element={<ProtectedRoute allowedRoles={['bibliothecaire', 'admin']} />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/library" element={<PlaceholderPage />} />
+            <Route path="/library" element={<Navigate to="/library/dashboard" replace />} />
+            <Route path="/library/dashboard" element={<LibraryDashboard />} />
+            <Route path="/library/books" element={<BookCatalog />} />
+            <Route path="/library/loans" element={<LoansManager />} />
           </Route>
         </Route>
 

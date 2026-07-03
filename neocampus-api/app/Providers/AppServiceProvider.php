@@ -25,6 +25,18 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Domain\Ports\ExamenPortInterface::class, \App\Infrastructure\Persistence\EloquentExamenRepository::class);
         $this->app->bind(\App\Domain\Ports\GradePortInterface::class, \App\Infrastructure\Persistence\EloquentGradeRepository::class);
         $this->app->bind(\App\Domain\Ports\BulletinPortInterface::class, \App\Infrastructure\Persistence\EloquentBulletinRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceFeePortInterface::class, \App\Infrastructure\Persistence\EloquentFinanceFeeRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinancePaymentPortInterface::class, \App\Infrastructure\Persistence\EloquentFinancePaymentRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceSoldePortInterface::class, \App\Infrastructure\Persistence\EloquentFinanceSoldeRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceGroupeFraisPortInterface::class, \App\Infrastructure\Persistence\EloquentGroupeFraisRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceTypeFraisPortInterface::class, \App\Infrastructure\Persistence\EloquentTypeFraisRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceReportPortInterface::class, \App\Infrastructure\Persistence\EloquentFinanceReportRepository::class);
+        $this->app->bind(\App\Domain\Ports\FinanceRecetteDepensePortInterface::class, \App\Infrastructure\Persistence\EloquentFinanceRecetteDepenseRepository::class);
+        
+        // Library Bindings
+        $this->app->bind(\App\Domain\Ports\BookRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentBookRepository::class);
+        $this->app->bind(\App\Domain\Ports\LoanRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentLoanRepository::class);
+        $this->app->bind(\App\Domain\Ports\MemberRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentMemberRepository::class);
     }
 
     /**
@@ -32,6 +44,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Frais::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Paiement::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Solde::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\GroupeFrais::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\TypeFrais::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\RecetteDepense::class, \App\Policies\FinancePolicy::class);
+
+        // Library Policy
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Livre::class, \App\Policies\LibraryPolicy::class);
     }
 }

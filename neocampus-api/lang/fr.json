@@ -1,0 +1,6 @@
+{
+  "validation.required": "The :attribute field is required.",
+  "validation.unique": "The :attribute has already been taken.",
+  "validation.integer": "The :attribute must be an integer.",
+  "validation.min.numeric": "The :attribute must be at least :min."
+}

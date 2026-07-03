@@ -22,4 +22,28 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        $exceptions->render(function (\App\Domain\Exceptions\InsufficientStockException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => new \stdClass(),
+                'code' => 'INSUFFICIENT_STOCK'
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Domain\Exceptions\LoanAlreadyReturnedException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => new \stdClass(),
+                'code' => 'LOAN_ALREADY_RETURNED'
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Domain\Exceptions\MaxLoansExceededException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => new \stdClass(),
+                'code' => 'MAX_LOANS_EXCEEDED'
+            ], 422);
+        });
     })->create();

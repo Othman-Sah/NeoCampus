@@ -22,8 +22,9 @@ import {
   Languages,
   PenTool,
   FileText,
-  TrendingUp,
-  CreditCard
+  CreditCard,
+  Coins,
+  Banknote
 } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { 
@@ -126,20 +127,48 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
-            { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
+            { nameKey: 'library_dashboard', path: '/library/dashboard', icon: BarChart3 },
+            { nameKey: 'library_books', path: '/library/books', icon: BookOpen },
+            { nameKey: 'library_loans', path: '/library/loans', icon: BookMarked },
           ]
         },
-        { id: 'analytics', nameKey: 'submenu_salaries', icon: CreditCard, hasSubmenu: false, path: '/finance/salaires' },
+        {
+          id: 'finance',
+          nameKey: 'submenu_finance',
+          icon: CreditCard,
+          hasSubmenu: true,
+          gridCols: 'grid-cols-2',
+          items: [
+            { nameKey: 'revenues_expenses', path: '/finance/salaires', icon: Banknote },
+            { nameKey: 'fees_setup', path: '/finance/fees', icon: Coins },
+            { nameKey: 'collections_record', path: '/finance/payments', icon: CreditCard },
+            { nameKey: 'balances_reports', path: '/finance/reports', icon: BarChart3 },
+          ]
+        },
         { id: 'communication', nameKey: 'communication', icon: MessageSquare, hasSubmenu: false, path: '/chatbot' },
         { id: 'transport', nameKey: 'transport', icon: Bus, hasSubmenu: false, path: '/transport' },
       ];
     case 'comptable':
       return [
-        { id: 'frais', nameKey: 'fees_setup', icon: Settings, hasSubmenu: false, path: '/finance/fees' },
+        { id: 'frais', nameKey: 'fees_setup', icon: Coins, hasSubmenu: false, path: '/finance/fees' },
         { id: 'encaissements', nameKey: 'collections_record', icon: CreditCard, hasSubmenu: false, path: '/finance/payments' },
-        { id: 'salaires', nameKey: 'submenu_salaries', icon: CreditCard, hasSubmenu: false, path: '/finance/salaires' },
-        { id: 'soldes', nameKey: 'balances_reports', icon: FileText, hasSubmenu: false, path: '/finance/reports' },
-        { id: 'recettes', nameKey: 'revenues_expenses', icon: TrendingUp, hasSubmenu: false, path: '/finance/accounting' },
+        { id: 'soldes', nameKey: 'balances_reports', icon: BarChart3, hasSubmenu: false, path: '/finance/reports' },
+        { id: 'payouts', nameKey: 'revenues_expenses', icon: Banknote, hasSubmenu: false, path: '/finance/salaires' },
+      ];
+    case 'bibliothecaire':
+      return [
+        { id: 'dashboard', nameKey: 'library_dashboard', icon: BarChart3, hasSubmenu: false, path: '/library/dashboard' },
+        {
+          id: 'library',
+          nameKey: 'submenu_library',
+          icon: BookOpen,
+          hasSubmenu: true,
+          gridCols: 'grid-cols-2',
+          items: [
+            { nameKey: 'library_books', path: '/library/books', icon: BookOpen },
+            { nameKey: 'library_loans', path: '/library/loans', icon: BookMarked },
+          ]
+        }
       ];
     default:
       return [];

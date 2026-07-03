@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Penalite extends Model
+{
+    protected $table = 'penalites';
+
+    protected $fillable = [
+        'frais_id',
+        'montant',
+        'motif',
+        'applique_par',
+    ];
+
+    public function frais(): BelongsTo
+    {
+        return $this->belongsTo(Frais::class, 'frais_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'applique_par');
+    }
+}

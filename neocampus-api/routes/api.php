@@ -28,29 +28,82 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
         Route::delete('/seances/{id}', [\App\Http\Controllers\Api\SeanceController::class, 'destroy']);
     });
 
-    // Admin-only Routes
+    // Admin and Comptable Read Routes
+    Route::middleware('role:admin,comptable')->prefix('admin')->group(function () {
+        Route::get('eleves', [\App\Http\Controllers\Api\StudentController::class, 'index']);
+        Route::get('eleves/{id}', [\App\Http\Controllers\Api\StudentController::class, 'show']);
+        Route::get('classes', [\App\Http\Controllers\Api\ClassController::class, 'index']);
+        Route::get('classes/{id}', [\App\Http\Controllers\Api\ClassController::class, 'show']);
+        Route::get('academic-years', [\App\Http\Controllers\Api\ClassController::class, 'academicYears']);
+        Route::get('sections', [\App\Http\Controllers\Api\SectionController::class, 'index']);
+        Route::get('enseignants', [\App\Http\Controllers\Api\TeacherController::class, 'index']);
+        Route::get('enseignants/{id}', [\App\Http\Controllers\Api\TeacherController::class, 'show']);
+    });
+
+    // Admin-only Write Routes
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::post('/eleves/{id}/avatar', [\App\Http\Controllers\Api\StudentController::class, 'uploadAvatar']);
         Route::post('/eleves/{id}/reveal-password', [\App\Http\Controllers\Api\StudentController::class, 'revealPassword']);
         Route::put('/eleves/{id}/password', [\App\Http\Controllers\Api\StudentController::class, 'updatePassword']);
-        Route::apiResource('eleves', \App\Http\Controllers\Api\StudentController::class);
-        Route::apiResource('classes', \App\Http\Controllers\Api\ClassController::class);
-        Route::get('academic-years', [\App\Http\Controllers\Api\ClassController::class, 'academicYears']);
-        Route::apiResource('sections', \App\Http\Controllers\Api\SectionController::class);
+        Route::post('eleves', [\App\Http\Controllers\Api\StudentController::class, 'store']);
+        Route::put('eleves/{eleve}', [\App\Http\Controllers\Api\StudentController::class, 'update']);
+        Route::delete('eleves/{eleve}', [\App\Http\Controllers\Api\StudentController::class, 'destroy']);
+
+        Route::post('classes', [\App\Http\Controllers\Api\ClassController::class, 'store']);
+        Route::put('classes/{class}', [\App\Http\Controllers\Api\ClassController::class, 'update']);
+        Route::delete('classes/{class}', [\App\Http\Controllers\Api\ClassController::class, 'destroy']);
+
+        Route::post('sections', [\App\Http\Controllers\Api\SectionController::class, 'store']);
+        Route::put('sections/{section}', [\App\Http\Controllers\Api\SectionController::class, 'update']);
+        Route::delete('sections/{section}', [\App\Http\Controllers\Api\SectionController::class, 'destroy']);
+
         Route::get('subjects', [\App\Http\Controllers\Api\TeacherController::class, 'subjects']);
         Route::post('enseignants/assign', [\App\Http\Controllers\Api\TeacherController::class, 'assign']);
         Route::post('enseignants/unassign', [\App\Http\Controllers\Api\TeacherController::class, 'unassign']);
         Route::post('/enseignants/{id}/avatar', [\App\Http\Controllers\Api\TeacherController::class, 'uploadAvatar']);
-        Route::apiResource('enseignants', \App\Http\Controllers\Api\TeacherController::class);
+        Route::post('enseignants', [\App\Http\Controllers\Api\TeacherController::class, 'store']);
+        Route::put('enseignants/{enseignant}', [\App\Http\Controllers\Api\TeacherController::class, 'update']);
+        Route::delete('enseignants/{enseignant}', [\App\Http\Controllers\Api\TeacherController::class, 'destroy']);
         Route::post('/enseignants/{id}/reveal-password', [\App\Http\Controllers\Api\TeacherController::class, 'revealPassword']);
+        Route::apiResource('accountants', \App\Http\Controllers\Api\AccountantController::class);
     });
 
     // Comptable (Finance) Routes
-    Route::middleware('role:comptable,admin')->prefix('finance')->group(function () {
-        Route::get('/reports/summary', function () {
-            return response()->json(['message' => 'Finance summary report placeholder.']);
-        });
+    Route::middleware(['role:comptable,admin', 'throttle:600,1'])->prefix('finance')->group(function () {
         Route::apiResource('salaires', \App\Http\Controllers\Api\SalaryController::class);
+        
+        // Fee Configuration
+        Route::get('/groups', [\App\Http\Controllers\Api\FinanceConfigController::class, 'listGroups']);
+        Route::post('/groups', [\App\Http\Controllers\Api\FinanceConfigController::class, 'storeGroup']);
+        Route::put('/groups/{group}', [\App\Http\Controllers\Api\FinanceConfigController::class, 'updateGroup']);
+        Route::delete('/groups/{group}', [\App\Http\Controllers\Api\FinanceConfigController::class, 'destroyGroup']);
+        
+        Route::get('/types', [\App\Http\Controllers\Api\FinanceConfigController::class, 'listTypes']);
+        Route::post('/types', [\App\Http\Controllers\Api\FinanceConfigController::class, 'storeType']);
+        Route::put('/types/{type}', [\App\Http\Controllers\Api\FinanceConfigController::class, 'updateType']);
+        Route::delete('/types/{type}', [\App\Http\Controllers\Api\FinanceConfigController::class, 'destroyType']);
+        
+        // Fee Assignment & Modifiers
+        Route::post('/fees/assign', [\App\Http\Controllers\Api\FinanceFeeController::class, 'assign']);
+        Route::get('/fees', [\App\Http\Controllers\Api\FinanceFeeController::class, 'index']);
+        Route::get('/fees/{id}', [\App\Http\Controllers\Api\FinanceFeeController::class, 'show']);
+        Route::post('/fees/{id}/remise', [\App\Http\Controllers\Api\FinanceFeeController::class, 'remise']);
+        Route::post('/fees/{id}/penalite', [\App\Http\Controllers\Api\FinanceFeeController::class, 'penalite']);
+        
+        // Payments & Student Balance
+        Route::post('/payments', [\App\Http\Controllers\Api\FinancePaymentController::class, 'store']);
+        Route::get('/payments', [\App\Http\Controllers\Api\FinancePaymentController::class, 'index']);
+        Route::get('/students/{id}/balance', [\App\Http\Controllers\Api\FinancePaymentController::class, 'studentBalance']);
+        
+        // Reports
+        Route::get('/reports/summary', [\App\Http\Controllers\Api\FinanceReportController::class, 'summary']);
+        Route::get('/reports/transactions', [\App\Http\Controllers\Api\FinanceReportController::class, 'transactions']);
+        
+        // Accounting
+        Route::get('/accounting', [\App\Http\Controllers\Api\FinanceAccountingController::class, 'index']);
+        Route::post('/accounting', [\App\Http\Controllers\Api\FinanceAccountingController::class, 'store']);
+        Route::put('/accounting/{id}', [\App\Http\Controllers\Api\FinanceAccountingController::class, 'update']);
+        Route::delete('/accounting/{id}', [\App\Http\Controllers\Api\FinanceAccountingController::class, 'destroy']);
     });
 
     // Enseignant (Teacher) Routes
@@ -99,6 +152,20 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
     // --- Bulletins Module ---
     Route::middleware('role:admin')->group(function () {
         Route::post('/bulletins/generate', [\App\Http\Controllers\Api\BulletinController::class, 'generate']);
+    });
+
+    // --- Library Module ---
+    Route::middleware('role:bibliothecaire,admin')->prefix('v1/library')->group(function () {
+        Route::get('/books', [\App\Http\Controllers\Api\Library\LibraryController::class, 'index']);
+        Route::post('/books', [\App\Http\Controllers\Api\Library\LibraryController::class, 'store']);
+        Route::put('/books/{id}', [\App\Http\Controllers\Api\Library\LibraryController::class, 'update']);
+        Route::delete('/books/{id}', [\App\Http\Controllers\Api\Library\LibraryController::class, 'destroy']);
+        Route::get('/loans', [\App\Http\Controllers\Api\Library\LibraryController::class, 'loans']);
+        Route::post('/loans', [\App\Http\Controllers\Api\Library\LibraryController::class, 'storeLoan']);
+        Route::put('/loans/{id}/return', [\App\Http\Controllers\Api\Library\LibraryController::class, 'returnBook']);
+        Route::get('/overdue', [\App\Http\Controllers\Api\Library\LibraryController::class, 'overdue']);
+        Route::get('/stats', [\App\Http\Controllers\Api\Library\LibraryController::class, 'stats']);
+        Route::get('/members', [\App\Http\Controllers\Api\Library\LibraryController::class, 'members']);
     });
 
     // Parent Routes

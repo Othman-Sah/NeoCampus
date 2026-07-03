@@ -178,6 +178,21 @@ export const StudentCreatePage: React.FC = () => {
       setErrorMsg('')
       const newStudent = await createStudent(formattedData)
 
+      // Save notification alert for Comptable/Admin to configure fee profile
+      if (newStudent && newStudent.id) {
+        const alerts = JSON.parse(localStorage.getItem('neocampus_finance_alerts') || '[]');
+        alerts.push({
+          id: Date.now(),
+          studentId: newStudent.id,
+          studentName: `${newStudent.prenom || values.prenom} ${newStudent.nom || values.nom}`,
+          className: selectedClassNom || 'N/A',
+          message: `New student ${newStudent.prenom || values.prenom} ${newStudent.nom || values.nom} registered. Click here to configure their fee profile.`,
+          created_at: new Date().toISOString(),
+          read: false
+        });
+        localStorage.setItem('neocampus_finance_alerts', JSON.stringify(alerts));
+      }
+
       // Upload avatar if a photo was selected
       if (photoFile && newStudent?.id) {
         try {

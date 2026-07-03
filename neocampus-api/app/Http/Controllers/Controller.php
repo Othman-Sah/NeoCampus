@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use OpenApi\Attributes as OA;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[OA\Info(
     title: "NeoCampus API Documentation",
@@ -23,5 +24,5 @@ use OpenApi\Attributes as OA;
 )]
 abstract class Controller
 {
-    //
+    use AuthorizesRequests;
 }

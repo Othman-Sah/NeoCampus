@@ -59,6 +59,8 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             SeanceSeeder::class,
             ExamParamSeeder::class,
+            FinanceSeeder::class,
+            LibrarySeeder::class,
         ]);
     }
 }
