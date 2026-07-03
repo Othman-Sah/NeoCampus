@@ -381,9 +381,9 @@ class LibraryController extends Controller
         $q = $request->query('q', '');
         $tenantId = $request->user()->etablissement_id;
 
-        $members = \App\Models\Adherent::with('user')
+        $members = \App\Models\Adherent::with('userModel')
             ->where('etablissement_id', $tenantId)
-            ->whereHas('user', function ($sub) use ($q) {
+            ->whereHas('userModel', function ($sub) use ($q) {
                 $sub->where('nom', 'like', "%{$q}%")
                     ->orWhere('prenom', 'like', "%{$q}%");
             })
@@ -392,11 +392,11 @@ class LibraryController extends Controller
 
         return response()->json([
             'data' => $members->map(function ($m) {
-                $fullName = trim(($m->user->prenom ?? '') . ' ' . ($m->user->nom ?? ''));
+                $fullName = trim(($m->userModel->prenom ?? '') . ' ' . ($m->userModel->nom ?? ''));
                 return [
                     'id' => $m->id,
                     'full_name' => $fullName,
-                    'type' => class_basename($m->user_type) === 'Eleve' ? 'Élève' : 'Enseignant'
+                    'type' => $m->userModel->role === 'eleve' ? 'Élève' : 'Enseignant'
                 ];
             })
         ]);

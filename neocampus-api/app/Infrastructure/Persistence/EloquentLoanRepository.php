@@ -51,7 +51,7 @@ class EloquentLoanRepository implements LoanRepositoryInterface
                 $sub->whereHas('livre', function ($b) use ($q) {
                     $b->where('titre', 'like', "%{$q}%")
                       ->orWhere('auteur', 'like', "%{$q}%");
-                })->orWhereHas('adherent.user', function ($u) use ($q) {
+                })->orWhereHas('adherent.userModel', function ($u) use ($q) {
                     $u->where('nom', 'like', "%{$q}%")
                       ->orWhere('prenom', 'like', "%{$q}%");
                 });

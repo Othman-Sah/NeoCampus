@@ -40,8 +40,6 @@ class EloquentBookRepository implements BookRepositoryInterface
             $disp = filter_var($filters['disponible'], FILTER_VALIDATE_BOOLEAN);
             if ($disp) {
                 $query->where('quantite_stock', '>', 0);
-            } else {
-                $query->where('quantite_stock', '=', 0);
             }
         }
 

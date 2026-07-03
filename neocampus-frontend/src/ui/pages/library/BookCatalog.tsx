@@ -15,8 +15,7 @@ import {
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetDescription,
-  SheetFooter
+  SheetDescription
 } from '@/components/ui/sheet'
 import {
   Dialog,
@@ -423,16 +422,16 @@ export const BookCatalog: React.FC = () => {
           </SheetHeader>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-6 px-6">
             
             {/* Title */}
             <div className="space-y-1.5">
-              <Label htmlFor="titre-input" className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label htmlFor="titre-input" className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('title_label')}
               </Label>
               <Input
                 id="titre-input"
-                className="rounded-xl border-neutral-250 text-xs font-semibold py-4"
+                className="rounded-xl border border-neutral-200 text-xs font-semibold py-3 px-4 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50 h-11"
                 placeholder="Ex. The Little Prince"
                 {...register('titre')}
               />
@@ -443,12 +442,12 @@ export const BookCatalog: React.FC = () => {
 
             {/* Author */}
             <div className="space-y-1.5">
-              <Label htmlFor="auteur-input" className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label htmlFor="auteur-input" className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('author_label')}
               </Label>
               <Input
                 id="auteur-input"
-                className="rounded-xl border-neutral-250 text-xs font-semibold py-4"
+                className="rounded-xl border border-neutral-200 text-xs font-semibold py-3 px-4 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50 h-11"
                 placeholder="Ex. Antoine de Saint-Exupery"
                 {...register('auteur')}
               />
@@ -459,12 +458,12 @@ export const BookCatalog: React.FC = () => {
 
             {/* ISBN */}
             <div className="space-y-1.5">
-              <Label htmlFor="isbn-input" className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label htmlFor="isbn-input" className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('isbn_label')}
               </Label>
               <Input
                 id="isbn-input"
-                className="rounded-xl border-neutral-250 text-xs font-semibold py-4"
+                className="rounded-xl border border-neutral-200 text-xs font-semibold py-3 px-4 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50 h-11"
                 placeholder="Ex. 9782070612758"
                 {...register('isbn')}
               />
@@ -475,12 +474,12 @@ export const BookCatalog: React.FC = () => {
 
             {/* Genre */}
             <div className="space-y-1.5">
-              <Label htmlFor="genre-select" className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label htmlFor="genre-select" className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('genre_label')}
               </Label>
               <select
                 id="genre-select"
-                className="w-full rounded-xl bg-white border border-neutral-250 text-xs font-semibold p-2.5 h-10 focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-semibold px-4 h-11 focus:outline-none focus:ring-1 focus:ring-black"
                 {...register('genre')}
               >
                 <option value="">Select a genre</option>
@@ -492,13 +491,13 @@ export const BookCatalog: React.FC = () => {
 
             {/* Stock Quantity */}
             <div className="space-y-1.5">
-              <Label htmlFor="stock-input" className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label htmlFor="stock-input" className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('stock_label')}
               </Label>
               <Input
                 id="stock-input"
                 type="number"
-                className="rounded-xl border-neutral-250 text-xs font-semibold py-4"
+                className="rounded-xl border border-neutral-200 text-xs font-semibold py-3 px-4 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50 h-11"
                 placeholder="1"
                 {...register('quantite_stock')}
               />
@@ -507,11 +506,11 @@ export const BookCatalog: React.FC = () => {
               )}
             </div>
 
-            <SheetFooter className="pt-6 border-t border-neutral-100 flex items-center justify-end gap-2">
+            <div className="pt-6 border-t border-neutral-100 flex flex-row items-center justify-end gap-3 w-full mt-6">
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer border border-neutral-200 rounded-xl text-xs font-bold uppercase py-4"
+                className="cursor-pointer border border-neutral-200 rounded-xl text-xs font-bold uppercase py-5 flex-1 h-11"
                 onClick={() => setIsSheetOpen(false)}
               >
                 {t('cancel_btn')}
@@ -519,11 +518,11 @@ export const BookCatalog: React.FC = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="cursor-pointer bg-black text-white hover:bg-neutral-800 rounded-xl text-xs font-bold uppercase py-4 border-none"
+                className="cursor-pointer bg-black text-white hover:bg-neutral-800 rounded-xl text-xs font-bold uppercase py-5 border-none flex-1 h-11"
               >
                 {isSubmitting ? 'Saving...' : t('save_btn')}
               </Button>
-            </SheetFooter>
+            </div>
 
           </form>
         </SheetContent>

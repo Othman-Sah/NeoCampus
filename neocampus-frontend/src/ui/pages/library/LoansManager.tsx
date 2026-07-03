@@ -14,8 +14,7 @@ import {
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetDescription,
-  SheetFooter
+  SheetDescription
 } from '@/components/ui/sheet'
 import {
   Dialog,
@@ -533,11 +532,11 @@ export const LoansManager: React.FC = () => {
           </SheetHeader>
 
           {/* Form */}
-          <div className="space-y-6 py-6">
+          <div className="space-y-6 py-6 px-6">
             
             {/* Member Search Selector */}
             <div className="space-y-2">
-              <Label className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('select_member')}
               </Label>
               
@@ -567,7 +566,7 @@ export const LoansManager: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400" />
                     <Input
                       placeholder={t('member_search_placeholder')}
-                      className="pl-9 rounded-xl border-neutral-250 text-xs font-semibold h-10"
+                      className="pl-9 rounded-xl border border-neutral-200 text-xs font-semibold h-11 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50"
                       value={memberSearch}
                       onChange={(e) => setMemberSearch(e.target.value)}
                     />
@@ -589,7 +588,7 @@ export const LoansManager: React.FC = () => {
                           className="w-full text-left p-2 hover:bg-neutral-50 rounded-lg text-xs font-bold flex items-center justify-between"
                         >
                           <span>{m.full_name}</span>
-                          <span className="text-[9px] font-extrabold uppercase text-neutral-400">{m.type}</span>
+                          <span className="text-[9px] font-extrabold uppercase text-neutral-450">{m.type}</span>
                         </button>
                       ))}
                     </div>
@@ -600,7 +599,7 @@ export const LoansManager: React.FC = () => {
 
             {/* Book Search Selector */}
             <div className="space-y-2">
-              <Label className="text-[10px] font-black text-neutral-500 uppercase tracking-wider">
+              <Label className="text-[10px] font-black text-neutral-550 uppercase tracking-wider">
                 {t('select_book')}
               </Label>
               
@@ -630,7 +629,7 @@ export const LoansManager: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400" />
                     <Input
                       placeholder={t('book_search_placeholder')}
-                      className="pl-9 rounded-xl border-neutral-250 text-xs font-semibold h-10"
+                      className="pl-9 rounded-xl border border-neutral-200 text-xs font-semibold h-11 focus:border-black focus:ring-1 focus:ring-black outline-none bg-neutral-50"
                       value={bookSearch}
                       onChange={(e) => setBookSearch(e.target.value)}
                     />
@@ -655,7 +654,7 @@ export const LoansManager: React.FC = () => {
                             <p className="truncate">{b.titre}</p>
                             <span className="text-[8px] text-neutral-400 font-semibold truncate block">ISBN: {b.isbn}</span>
                           </div>
-                          <span className="text-[9px] font-black uppercase text-neutral-450 shrink-0">{b.quantite_stock} copies</span>
+                          <span className="text-[9px] font-black uppercase text-neutral-455 shrink-0">{b.quantite_stock} copies</span>
                         </button>
                       ))}
                     </div>
@@ -681,11 +680,11 @@ export const LoansManager: React.FC = () => {
               )}
             </div>
 
-            <SheetFooter className="pt-6 border-t border-neutral-100 flex items-center justify-end gap-2">
+            <div className="pt-6 border-t border-neutral-100 flex flex-row items-center justify-end gap-3 w-full mt-6">
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer border border-neutral-200 rounded-xl text-xs font-bold uppercase py-4"
+                className="cursor-pointer border border-neutral-200 rounded-xl text-xs font-bold uppercase py-5 flex-1 h-11"
                 onClick={() => {
                   setIsSheetOpen(false)
                   setSelectedMember(null)
@@ -698,11 +697,11 @@ export const LoansManager: React.FC = () => {
                 type="button"
                 disabled={!selectedBook || !selectedMember || selectedBook.quantite_stock <= 0}
                 onClick={handleSaveLoan}
-                className="cursor-pointer bg-black text-white hover:bg-neutral-800 rounded-xl text-xs font-bold uppercase py-4 border-none disabled:opacity-50"
+                className="cursor-pointer bg-black text-white hover:bg-neutral-800 rounded-xl text-xs font-bold uppercase py-5 border-none disabled:opacity-50 flex-1 h-11"
               >
                 Record Loan
               </Button>
-            </SheetFooter>
+            </div>
 
           </div>
         </SheetContent>

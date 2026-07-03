@@ -49,6 +49,14 @@ class Adherent extends Model
     }
 
     /**
+     * Direct relationship to User model.
+     */
+    public function userModel(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * Get loans for this member.
      */
     public function emprunts(): HasMany
