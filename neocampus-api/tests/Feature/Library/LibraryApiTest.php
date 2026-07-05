@@ -228,4 +228,161 @@ class LibraryApiTest extends TestCase
                 'overdue_loans' => 0,
             ]);
     }
+
+    public function test_can_get_library_settings(): void
+    {
+        $response = $this->getJson('/api/v1/library/settings');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'max_loans_per_member',
+                'loan_duration_days',
+                'fine_per_day_mad'
+            ]);
+    }
+
+    public function test_can_update_library_settings(): void
+    {
+        $response = $this->putJson('/api/v1/library/settings', [
+            'max_loans_per_member' => 8,
+            'loan_duration_days' => 20,
+            'fine_per_day_mad' => 5
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('message', 'Paramètres mis à jour avec succès.');
+
+        $this->assertDatabaseHas('library_settings', [
+            'etablissement_id' => $this->etablissement->id,
+            'key' => 'max_loans_per_member',
+            'value' => 8
+        ]);
+    }
+
+    public function test_can_get_library_members_list(): void
+    {
+        $response = $this->getJson('/api/v1/library/members/list');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'current_page',
+                'data' => [
+                    [
+                        'id',
+                        'user_id',
+                        'user_type',
+                        'etablissement_id',
+                        'full_name',
+                        'type',
+                        'active_loans_count',
+                        'overdue_loans_count',
+                        'total_unpaid_fines'
+                    ]
+                ]
+            ]);
+    }
+
+    public function test_can_get_library_member_history(): void
+    {
+        $response = $this->getJson("/api/v1/library/members/{$this->adherent->id}/history");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => []
+            ]);
+    }
+
+    public function test_can_list_fines(): void
+    {
+        // Create an overdue loan that will have an accrued fine
+        Emprunt::create([
+            'livre_id' => $this->book->id,
+            'adherent_id' => $this->adherent->id,
+            'date_emprunt' => now()->subDays(20)->toDateString(),
+            'date_retour_prevue' => now()->subDays(6)->toDateString(), // 6 days overdue
+            'statut' => 'en_retard',
+            'etablissement_id' => $this->etablissement->id,
+        ]);
+
+        $response = $this->getJson('/api/v1/library/fines?status=unpaid');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    [
+                        'id',
+                        'jours_retard',
+                        'amende',
+                        'amende_payee',
+                        'amende_annulee'
+                    ]
+                ]
+            ]);
+    }
+
+    public function test_can_pay_fine(): void
+    {
+        $loan = Emprunt::create([
+            'livre_id' => $this->book->id,
+            'adherent_id' => $this->adherent->id,
+            'date_emprunt' => now()->subDays(20)->toDateString(),
+            'date_retour_prevue' => now()->subDays(6)->toDateString(),
+            'statut' => 'en_retard',
+            'etablissement_id' => $this->etablissement->id,
+        ]);
+
+        $response = $this->postJson("/api/v1/library/fines/{$loan->id}/pay");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.amende_payee', true);
+
+        $this->assertDatabaseHas('emprunts', [
+            'id' => $loan->id,
+            'amende_payee' => true,
+        ]);
+    }
+
+    public function test_can_waive_fine(): void
+    {
+        $loan = Emprunt::create([
+            'livre_id' => $this->book->id,
+            'adherent_id' => $this->adherent->id,
+            'date_emprunt' => now()->subDays(20)->toDateString(),
+            'date_retour_prevue' => now()->subDays(6)->toDateString(),
+            'statut' => 'en_retard',
+            'etablissement_id' => $this->etablissement->id,
+        ]);
+
+        $response = $this->postJson("/api/v1/library/fines/{$loan->id}/waive");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.amende_annulee', true);
+
+        $this->assertDatabaseHas('emprunts', [
+            'id' => $loan->id,
+            'amende_annulee' => true,
+        ]);
+    }
+
+    public function test_can_get_library_analytics(): void
+    {
+        $response = $this->getJson('/api/v1/library/analytics');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'top_books',
+                'top_genres',
+                'monthly_trends',
+                'loan_ratio' => [
+                    'returned',
+                    'overdue',
+                    'active_on_time'
+                ],
+                'fines' => [
+                    'collected',
+                    'outstanding',
+                    'waived'
+                ]
+            ]);
+    }
 }

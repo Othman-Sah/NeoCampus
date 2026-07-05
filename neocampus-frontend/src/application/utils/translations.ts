@@ -128,10 +128,6 @@ export const translations = {
     library_dashboard: "Library Dashboard",
     library_books: "Book Catalog",
     library_loans: "Loans Manager",
-    library_members: "Members Directory",
-    library_fines: "Fines Ledger",
-    library_analytics: "Analytics",
-    library_settings: "Library Settings",
     quick_search: "Quick Search",
     overdue_alert_banner: "Alert: You have {count} overdue loans! Please return them as soon as possible.",
     search_books_members: "Search books or members...",
@@ -185,7 +181,11 @@ export const translations = {
     confirm_btn: "Confirm",
     overdue_tab: "Overdue only",
     overdue_days_column: "Days overdue",
-    fine_column: "Fine (MAD)"
+    fine_column: "Fine (MAD)",
+    library_members: "Members Directory",
+    library_fines: "Fines Ledger",
+    library_analytics: "Analytics & Reports",
+    library_settings: "Library Settings"
   },
   en: {
     // Navigation / Categories
@@ -314,10 +314,6 @@ export const translations = {
     library_dashboard: "Library Dashboard",
     library_books: "Book Catalog",
     library_loans: "Loans Manager",
-    library_members: "Members Directory",
-    library_fines: "Fines Ledger",
-    library_analytics: "Analytics",
-    library_settings: "Library Settings",
     quick_search: "Quick Search",
     overdue_alert_banner: "Alert: You have {count} overdue loans! Please return them as soon as possible.",
     search_books_members: "Search books or members...",
@@ -371,7 +367,11 @@ export const translations = {
     confirm_btn: "Confirm",
     overdue_tab: "Overdue only",
     overdue_days_column: "Days overdue",
-    fine_column: "Fine (MAD)"
+    fine_column: "Fine (MAD)",
+    library_members: "Members Directory",
+    library_fines: "Fines Ledger",
+    library_analytics: "Analytics & Reports",
+    library_settings: "Library Settings"
   }
 };
 

@@ -61,5 +61,50 @@ export const libraryApiService: ILibraryService = {
   async searchMembers(q) {
     const response = await axiosClient.get('/v1/library/members', { params: { q } });
     return response.data.data;
+  },
+
+  async getSettings() {
+    const response = await axiosClient.get('/v1/library/settings');
+    return response.data;
+  },
+
+  async updateSettings(settings) {
+    await axiosClient.put('/v1/library/settings', settings);
+  },
+
+  async getMembersList(params) {
+    const response = await axiosClient.get('/v1/library/members/list', { params });
+    return {
+      data: response.data.data,
+      meta: response.data.meta || { current_page: 1, last_page: 1, total: response.data.data?.length || 0 }
+    };
+  },
+
+  async getMemberHistory(id) {
+    const response = await axiosClient.get(`/v1/library/members/${id}/history`);
+    return response.data.data;
+  },
+
+  async getFines(params) {
+    const response = await axiosClient.get('/v1/library/fines', { params });
+    return {
+      data: response.data.data,
+      meta: response.data.meta || { current_page: 1, last_page: 1, total: response.data.data?.length || 0 }
+    };
+  },
+
+  async payFine(id) {
+    const response = await axiosClient.post(`/v1/library/fines/${id}/pay`);
+    return response.data.data;
+  },
+
+  async waiveFine(id) {
+    const response = await axiosClient.post(`/v1/library/fines/${id}/waive`);
+    return response.data.data;
+  },
+
+  async getAnalytics() {
+    const response = await axiosClient.get('/v1/library/analytics');
+    return response.data;
   }
 };

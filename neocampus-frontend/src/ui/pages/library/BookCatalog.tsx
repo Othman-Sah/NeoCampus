@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from '@/application/useCases/useTranslation'
+import { LibrarySubNav } from './LibrarySubNav'
 import { useBooks } from '@/application/useCases/library/useBooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -240,6 +241,8 @@ export const BookCatalog: React.FC = () => {
           <Plus className="h-4 w-4" /> {t('add_book_title')}
         </Button>
       </div>
+
+      <LibrarySubNav />
 
       {/* Filters & Search Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-[20px] border border-neutral-100 shadow-sm">

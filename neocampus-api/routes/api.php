@@ -166,6 +166,16 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
         Route::get('/overdue', [\App\Http\Controllers\Api\Library\LibraryController::class, 'overdue']);
         Route::get('/stats', [\App\Http\Controllers\Api\Library\LibraryController::class, 'stats']);
         Route::get('/members', [\App\Http\Controllers\Api\Library\LibraryController::class, 'members']);
+        
+        // Extended Library routes
+        Route::get('/settings', [\App\Http\Controllers\Api\Library\LibraryController::class, 'getSettings']);
+        Route::put('/settings', [\App\Http\Controllers\Api\Library\LibraryController::class, 'updateSettings']);
+        Route::get('/members/list', [\App\Http\Controllers\Api\Library\LibraryController::class, 'membersList']);
+        Route::get('/members/{id}/history', [\App\Http\Controllers\Api\Library\LibraryController::class, 'memberHistory']);
+        Route::get('/fines', [\App\Http\Controllers\Api\Library\LibraryController::class, 'fines']);
+        Route::post('/fines/{id}/pay', [\App\Http\Controllers\Api\Library\LibraryController::class, 'payFine']);
+        Route::post('/fines/{id}/waive', [\App\Http\Controllers\Api\Library\LibraryController::class, 'waiveFine']);
+        Route::get('/analytics', [\App\Http\Controllers\Api\Library\LibraryController::class, 'analytics']);
     });
 
     // Parent Routes

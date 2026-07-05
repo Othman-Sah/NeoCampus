@@ -127,9 +127,22 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
+          ]
+        },
+        {
+          id: 'library',
+          nameKey: 'submenu_library',
+          icon: BookMarked,
+          hasSubmenu: true,
+          gridCols: 'grid-cols-3',
+          items: [
             { nameKey: 'library_dashboard', path: '/library/dashboard', icon: BarChart3 },
             { nameKey: 'library_books', path: '/library/books', icon: BookOpen },
             { nameKey: 'library_loans', path: '/library/loans', icon: BookMarked },
+            { nameKey: 'library_members', path: '/library/members', icon: Users },
+            { nameKey: 'library_fines', path: '/library/fines', icon: CreditCard },
+            { nameKey: 'library_analytics', path: '/library/analytics', icon: BarChart3 },
+            { nameKey: 'library_settings', path: '/library/settings', icon: Settings },
           ]
         },
         {
@@ -157,16 +170,20 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
       ];
     case 'bibliothecaire':
       return [
-        { id: 'dashboard', nameKey: 'library_dashboard', icon: BarChart3, hasSubmenu: false, path: '/library/dashboard' },
         {
           id: 'library',
           nameKey: 'submenu_library',
-          icon: BookOpen,
+          icon: BookMarked,
           hasSubmenu: true,
-          gridCols: 'grid-cols-2',
+          gridCols: 'grid-cols-3',
           items: [
+            { nameKey: 'library_dashboard', path: '/library/dashboard', icon: BarChart3 },
             { nameKey: 'library_books', path: '/library/books', icon: BookOpen },
             { nameKey: 'library_loans', path: '/library/loans', icon: BookMarked },
+            { nameKey: 'library_members', path: '/library/members', icon: Users },
+            { nameKey: 'library_fines', path: '/library/fines', icon: CreditCard },
+            { nameKey: 'library_analytics', path: '/library/analytics', icon: BarChart3 },
+            { nameKey: 'library_settings', path: '/library/settings', icon: Settings },
           ]
         }
       ];

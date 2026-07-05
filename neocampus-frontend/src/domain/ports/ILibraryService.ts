@@ -42,4 +42,13 @@ export interface ILibraryService {
   }>;
 
   searchMembers(q: string): Promise<Member[]>;
+
+  getSettings(): Promise<{ max_loans_per_member: number; loan_duration_days: number; fine_per_day_mad: number }>;
+  updateSettings(settings: { max_loans_per_member: number; loan_duration_days: number; fine_per_day_mad: number }): Promise<void>;
+  getMembersList(params?: { q?: string; page?: number; per_page?: number }): Promise<{ data: any[]; meta: any }>;
+  getMemberHistory(id: number): Promise<Loan[]>;
+  getFines(params?: { status?: string; q?: string; page?: number; per_page?: number }): Promise<{ data: Loan[]; meta: any }>;
+  payFine(id: number): Promise<Loan>;
+  waiveFine(id: number): Promise<Loan>;
+  getAnalytics(): Promise<any>;
 }

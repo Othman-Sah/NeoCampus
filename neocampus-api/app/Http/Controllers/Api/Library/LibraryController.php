@@ -21,6 +21,14 @@ use App\Application\UseCases\Library\DeleteBookUseCase;
 use App\Application\UseCases\Library\CreateLoanUseCase;
 use App\Application\UseCases\Library\ReturnLoanUseCase;
 use App\Application\UseCases\Library\ListOverdueLoansUseCase;
+use App\Application\UseCases\Library\GetLibrarySettingsUseCase;
+use App\Application\UseCases\Library\UpdateLibrarySettingsUseCase;
+use App\Application\UseCases\Library\ListLibraryMembersUseCase;
+use App\Application\UseCases\Library\GetMemberLoanHistoryUseCase;
+use App\Application\UseCases\Library\ListFinesUseCase;
+use App\Application\UseCases\Library\PayFineUseCase;
+use App\Application\UseCases\Library\WaiveFineUseCase;
+use App\Application\UseCases\Library\GetLibraryAnalyticsUseCase;
 use App\Models\Livre;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,6 +50,14 @@ class LibraryController extends Controller
     private CreateLoanUseCase $createLoanUseCase;
     private ReturnLoanUseCase $returnLoanUseCase;
     private ListOverdueLoansUseCase $listOverdueLoansUseCase;
+    private GetLibrarySettingsUseCase $getLibrarySettingsUseCase;
+    private UpdateLibrarySettingsUseCase $updateLibrarySettingsUseCase;
+    private ListLibraryMembersUseCase $listLibraryMembersUseCase;
+    private GetMemberLoanHistoryUseCase $getMemberLoanHistoryUseCase;
+    private ListFinesUseCase $listFinesUseCase;
+    private PayFineUseCase $payFineUseCase;
+    private WaiveFineUseCase $waiveFineUseCase;
+    private GetLibraryAnalyticsUseCase $getLibraryAnalyticsUseCase;
 
     public function __construct(
         ListBooksUseCase $listBooksUseCase,
@@ -50,7 +66,15 @@ class LibraryController extends Controller
         DeleteBookUseCase $deleteBookUseCase,
         CreateLoanUseCase $createLoanUseCase,
         ReturnLoanUseCase $returnLoanUseCase,
-        ListOverdueLoansUseCase $listOverdueLoansUseCase
+        ListOverdueLoansUseCase $listOverdueLoansUseCase,
+        GetLibrarySettingsUseCase $getLibrarySettingsUseCase,
+        UpdateLibrarySettingsUseCase $updateLibrarySettingsUseCase,
+        ListLibraryMembersUseCase $listLibraryMembersUseCase,
+        GetMemberLoanHistoryUseCase $getMemberLoanHistoryUseCase,
+        ListFinesUseCase $listFinesUseCase,
+        PayFineUseCase $payFineUseCase,
+        WaiveFineUseCase $waiveFineUseCase,
+        GetLibraryAnalyticsUseCase $getLibraryAnalyticsUseCase
     ) {
         $this->listBooksUseCase = $listBooksUseCase;
         $this->createBookUseCase = $createBookUseCase;
@@ -59,6 +83,14 @@ class LibraryController extends Controller
         $this->createLoanUseCase = $createLoanUseCase;
         $this->returnLoanUseCase = $returnLoanUseCase;
         $this->listOverdueLoansUseCase = $listOverdueLoansUseCase;
+        $this->getLibrarySettingsUseCase = $getLibrarySettingsUseCase;
+        $this->updateLibrarySettingsUseCase = $updateLibrarySettingsUseCase;
+        $this->listLibraryMembersUseCase = $listLibraryMembersUseCase;
+        $this->getMemberLoanHistoryUseCase = $getMemberLoanHistoryUseCase;
+        $this->listFinesUseCase = $listFinesUseCase;
+        $this->payFineUseCase = $payFineUseCase;
+        $this->waiveFineUseCase = $waiveFineUseCase;
+        $this->getLibraryAnalyticsUseCase = $getLibraryAnalyticsUseCase;
     }
 
     /**
@@ -400,5 +432,94 @@ class LibraryController extends Controller
                 ];
             })
         ]);
+    }
+
+    public function getSettings(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAny', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+        $settings = $this->getLibrarySettingsUseCase->execute($tenantId);
+        return response()->json($settings);
+    }
+
+    public function updateSettings(Request $request): JsonResponse
+    {
+        Gate::authorize('update', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+        
+        $validated = $request->validate([
+            'max_loans_per_member' => 'required|integer|min:1',
+            'loan_duration_days' => 'required|integer|min:1',
+            'fine_per_day_mad' => 'required|numeric|min:0',
+        ]);
+
+        $this->updateLibrarySettingsUseCase->execute($tenantId, $validated);
+
+        return response()->json(['message' => 'Paramètres mis à jour avec succès.']);
+    }
+
+    public function membersList(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAny', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+        $search = $request->query('q', '');
+        $perPage = min($request->integer('per_page', 15), 100);
+
+        $paginated = $this->listLibraryMembersUseCase->execute($tenantId, $perPage, $search);
+
+        return response()->json($paginated);
+    }
+
+    public function memberHistory(Request $request, int $id): JsonResponse
+    {
+        Gate::authorize('viewAny', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+
+        $loans = $this->getMemberLoanHistoryUseCase->execute($tenantId, $id);
+
+        return LoanResource::collection($loans)->response();
+    }
+
+    public function fines(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAny', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+        $status = $request->query('status'); // unpaid, paid, waived, all
+        $search = $request->query('q');
+        $perPage = min($request->integer('per_page', 15), 100);
+
+        $paginated = $this->listFinesUseCase->execute($tenantId, $perPage, $status, $search);
+
+        return LoanResource::collection($paginated)->response();
+    }
+
+    public function payFine(Request $request, int $id): JsonResponse
+    {
+        Gate::authorize('update', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+
+        $loan = $this->payFineUseCase->execute($tenantId, $id);
+
+        return (new LoanResource($loan))->response();
+    }
+
+    public function waiveFine(Request $request, int $id): JsonResponse
+    {
+        Gate::authorize('update', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+
+        $loan = $this->waiveFineUseCase->execute($tenantId, $id);
+
+        return (new LoanResource($loan))->response();
+    }
+
+    public function analytics(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAny', Livre::class);
+        $tenantId = $request->user()->etablissement_id;
+
+        $data = $this->getLibraryAnalyticsUseCase->execute($tenantId);
+
+        return response()->json($data);
     }
 }

@@ -22,6 +22,8 @@ class Emprunt extends Model
         'date_retour_prevue',
         'date_retour_effective',
         'statut',
+        'amende_payee',
+        'amende_annulee',
         'etablissement_id',
     ];
 
@@ -29,6 +31,8 @@ class Emprunt extends Model
         'date_emprunt' => 'date:Y-m-d',
         'date_retour_prevue' => 'date:Y-m-d',
         'date_retour_effective' => 'date:Y-m-d',
+        'amende_payee' => 'boolean',
+        'amende_annulee' => 'boolean',
     ];
 
     /**

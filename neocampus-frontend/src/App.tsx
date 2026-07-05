@@ -34,6 +34,10 @@ import { GradesDashboardPage } from '@/ui/pages/grades/GradesDashboardPage'
 import LibraryDashboard from '@/ui/pages/library/LibraryDashboard'
 import BookCatalog from '@/ui/pages/library/BookCatalog'
 import LoansManager from '@/ui/pages/library/LoansManager'
+import LibraryMembers from '@/ui/pages/library/LibraryMembers'
+import LibraryFines from '@/ui/pages/library/LibraryFines'
+import LibraryAnalytics from '@/ui/pages/library/LibraryAnalytics'
+import LibrarySettings from '@/ui/pages/library/LibrarySettings'
 
 export const App: React.FC = () => {
   return (
@@ -105,6 +109,10 @@ export const App: React.FC = () => {
             <Route path="/library/dashboard" element={<LibraryDashboard />} />
             <Route path="/library/books" element={<BookCatalog />} />
             <Route path="/library/loans" element={<LoansManager />} />
+            <Route path="/library/members" element={<LibraryMembers />} />
+            <Route path="/library/fines" element={<LibraryFines />} />
+            <Route path="/library/analytics" element={<LibraryAnalytics />} />
+            <Route path="/library/settings" element={<LibrarySettings />} />
           </Route>
         </Route>
 

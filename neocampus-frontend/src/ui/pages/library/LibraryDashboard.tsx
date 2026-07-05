@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from '@/application/useCases/useTranslation'
+import { LibrarySubNav } from './LibrarySubNav'
 import { useLibraryStats } from '@/application/useCases/library/useLibraryStats'
 import { useLoans } from '@/application/useCases/library/useLoans'
 import { useBooks } from '@/application/useCases/library/useBooks'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { 
@@ -93,19 +93,9 @@ export const LibraryDashboard: React.FC = () => {
             Manage your book catalog and track student loans.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link to="/library/books">
-            <Button className="cursor-pointer bg-black text-white hover:bg-neutral-800 font-bold text-xs uppercase rounded-xl py-5">
-              {t('library_books')}
-            </Button>
-          </Link>
-          <Link to="/library/loans">
-            <Button className="cursor-pointer bg-white text-black hover:bg-neutral-50 border border-neutral-200 font-bold text-xs uppercase rounded-xl py-5">
-              {t('library_loans')}
-            </Button>
-          </Link>
-        </div>
       </div>
+
+      <LibrarySubNav />
 
       {/* Overdue Alert banner */}
       {!statsLoading && stats.overdue_loans > 0 && (

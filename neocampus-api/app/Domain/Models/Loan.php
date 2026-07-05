@@ -11,6 +11,8 @@ class Loan
     public string $date_retour_prevue;
     public ?string $date_retour_effective;
     public string $statut;
+    public bool $amende_payee;
+    public bool $amende_annulee;
     public int $etablissement_id;
     public ?string $created_at;
     public ?string $updated_at;
@@ -28,6 +30,8 @@ class Loan
         $this->date_retour_prevue = $data['date_retour_prevue'] ?? '';
         $this->date_retour_effective = $data['date_retour_effective'] ?? null;
         $this->statut = $data['statut'] ?? 'en_cours';
+        $this->amende_payee = (bool) ($data['amende_payee'] ?? false);
+        $this->amende_annulee = (bool) ($data['amende_annulee'] ?? false);
         $this->etablissement_id = $data['etablissement_id'] ?? 0;
         $this->created_at = $data['created_at'] ?? null;
         $this->updated_at = $data['updated_at'] ?? null;
@@ -50,6 +54,8 @@ class Loan
             'date_retour_prevue' => $this->date_retour_prevue,
             'date_retour_effective' => $this->date_retour_effective,
             'statut' => $this->statut,
+            'amende_payee' => $this->amende_payee,
+            'amende_annulee' => $this->amende_annulee,
             'etablissement_id' => $this->etablissement_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -45,6 +45,10 @@ class LoanResource extends JsonResource
             'date_retour_prevue' => $data['date_retour_prevue'] ?? '',
             'date_retour_effective' => $data['date_retour_effective'] ?? null,
             'statut' => $data['statut'] ?? 'en_cours',
+            'amende_payee' => (bool) ($data['amende_payee'] ?? false),
+            'amende_annulee' => (bool) ($data['amende_annulee'] ?? false),
+            'jours_retard' => $this->resource->jours_retard ?? $data['jours_retard'] ?? null,
+            'amende' => $this->resource->amende ?? $data['amende'] ?? null,
         ];
     }
 }

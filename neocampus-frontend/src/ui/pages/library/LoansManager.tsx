@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from '@/application/useCases/useTranslation'
+import { LibrarySubNav } from './LibrarySubNav'
 import { useLoans } from '@/application/useCases/library/useLoans'
 import { useOverdueLoans } from '@/application/useCases/library/useOverdueLoans'
 import { libraryApiService } from '@/infrastructure/api/libraryApiService'
@@ -244,6 +245,8 @@ export const LoansManager: React.FC = () => {
           <Plus className="h-4 w-4" /> {t('new_loan_btn')}
         </Button>
       </div>
+
+      <LibrarySubNav />
 
       {/* Tab Switcher */}
       <div className="flex border-b border-neutral-200">
