@@ -16,6 +16,7 @@ class GenerateBulletinRequest extends FormRequest
         return [
             'classe_id' => 'required|integer|exists:classes,id',
             'periode' => 'required|string|max:255',
+            'annee_scolaire' => 'required|string|max:255',
         ];
     }
 }

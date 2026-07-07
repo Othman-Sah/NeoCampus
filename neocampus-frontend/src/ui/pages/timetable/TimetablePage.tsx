@@ -38,7 +38,8 @@ import {
   X,
   Sparkles,
   Plus,
-  Trash2
+  Trash2,
+  AlertTriangle
 } from 'lucide-react'
 
 const FORM_TIME_SLOTS = [
@@ -51,7 +52,7 @@ export const TimetablePage: React.FC = () => {
   const { user } = useAuthStore()
   
   // Custom API Hooks
-  const { classes, loadingClasses } = useClass()
+  const { classes, loadingClasses, useClassMatieresWithEnseignants } = useClass()
   const { teachers, loadingTeachers, subjects, loadingSubjects } = useTeacher()
   const { students } = useStudent()
   
@@ -83,6 +84,8 @@ export const TimetablePage: React.FC = () => {
   const [formDay, setFormDay] = useState<string>('Lundi')
   const [formStartTime, setFormStartTime] = useState<string>('08:00')
   const [formEndTime, setFormEndTime] = useState<string>('09:00')
+
+  const { data: classSubjects, isLoading: loadingClassSubjects } = useClassMatieresWithEnseignants(Number(formClassId))
   
   // Error / Success notification states
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -236,8 +239,8 @@ export const TimetablePage: React.FC = () => {
     
     // Autofill defaults
     setFormClassId(selectedClassId > 0 ? selectedClassId.toString() : (classes[0]?.id.toString() || ''))
-    setFormTeacherId(selectedTeacherId > 0 ? selectedTeacherId.toString() : (teachers[0]?.id.toString() || ''))
-    setFormMatiereId(subjects[0]?.id.toString() || '')
+    setFormTeacherId('')
+    setFormMatiereId('')
     setFormDay(day)
     setFormStartTime(hour)
     
@@ -543,57 +546,18 @@ export const TimetablePage: React.FC = () => {
               </div>
             )}
 
-            {/* Subject Select */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-neutral-500">Subject</Label>
-              {loadingSubjects ? (
-                <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
-              ) : (
-                <Select value={formMatiereId} onValueChange={(val) => setFormMatiereId(val || '')}>
-                  <SelectTrigger className="rounded-xl border-neutral-200">
-                    <SelectValue placeholder="Choose a subject">
-                      {subjects.find(s => s.id.toString() === formMatiereId) 
-                        ? `${subjects.find(s => s.id.toString() === formMatiereId).intitule || subjects.find(s => s.id.toString() === formMatiereId).nom} [${subjects.find(s => s.id.toString() === formMatiereId).code}]` 
-                        : ''}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-neutral-200">
-                    {subjects.map(s => (
-                      <SelectItem key={s.id} value={s.id.toString()}>
-                        {s.intitule || s.nom} [{s.code}]
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-
-            {/* Teacher Select */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-neutral-500">Teacher</Label>
-              <Select value={formTeacherId} onValueChange={(val) => setFormTeacherId(val || '')}>
-                <SelectTrigger className="rounded-xl border-neutral-200">
-                  <SelectValue placeholder="Choose a teacher">
-                    {teachers.find(t => t.id.toString() === formTeacherId)
-                      ? `${teachers.find(t => t.id.toString() === formTeacherId)?.user?.prenom} ${teachers.find(t => t.id.toString() === formTeacherId)?.user?.nom}`
-                      : ''}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent className="bg-white border-neutral-200">
-                  {teachers.map((t: Teacher) => (
-                    <SelectItem key={t.id} value={t.id.toString()}>
-                      {t.user?.prenom} {t.user?.nom} ({t.specialite})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Class Select */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-neutral-500">Class Group</Label>
-              <Select value={formClassId} onValueChange={(val) => setFormClassId(val || '')}>
-                <SelectTrigger className="rounded-xl border-neutral-200">
+              <Select 
+                value={formClassId} 
+                onValueChange={(val) => {
+                  setFormClassId(val || '')
+                  setFormMatiereId('')
+                  setFormTeacherId('')
+                }}
+              >
+                <SelectTrigger className="rounded-xl border-neutral-200 bg-white">
                   <SelectValue placeholder="Choose a class">
                     {classes.find(c => c.id.toString() === formClassId)?.nom || ''}
                   </SelectValue>
@@ -606,6 +570,78 @@ export const TimetablePage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Subject Select */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-neutral-500">Subject</Label>
+              {!formClassId ? (
+                <div className="text-xs text-neutral-400 border border-dashed border-neutral-200 rounded-xl p-2.5 text-center bg-neutral-50/50">
+                  Select a class first
+                </div>
+              ) : loadingClassSubjects ? (
+                <div className="flex items-center gap-1.5 text-xs text-neutral-500 p-2 border border-neutral-100 rounded-xl bg-neutral-50/50">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-450" />
+                  <span>Loading class subjects...</span>
+                </div>
+              ) : (
+                <Select 
+                  value={formMatiereId} 
+                  onValueChange={(val) => {
+                    setFormMatiereId(val || '')
+                    const match = classSubjects?.find((cs: any) => cs.matiere_id.toString() === val)
+                    if (match && match.enseignant_id) {
+                      setFormTeacherId(match.enseignant_id.toString())
+                    } else {
+                      setFormTeacherId('')
+                    }
+                  }}
+                >
+                  <SelectTrigger className="rounded-xl border-neutral-200 bg-white">
+                    <SelectValue placeholder="Choose a subject">
+                      {classSubjects?.find((cs: any) => cs.matiere_id.toString() === formMatiereId)?.matiere_nom || ''}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-neutral-200">
+                    {classSubjects && classSubjects.map((cs: any) => (
+                      <SelectItem key={cs.matiere_id} value={cs.matiere_id.toString()}>
+                        {cs.matiere_nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+
+            {/* Teacher Select */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-neutral-500">Teacher</Label>
+              <Select 
+                value={formTeacherId} 
+                disabled={!formMatiereId || !!(formMatiereId && classSubjects?.find(cs => cs.matiere_id.toString() === formMatiereId)?.enseignant_id)}
+                onValueChange={(val) => setFormTeacherId(val || '')}
+              >
+                <SelectTrigger className="rounded-xl border-neutral-200 bg-white disabled:opacity-85 disabled:bg-neutral-50">
+                  <SelectValue placeholder="Choose a teacher">
+                    {teachers.find(t => t.id.toString() === formTeacherId)
+                      ? `${teachers.find(t => t.id.toString() === formTeacherId)?.user?.prenom} ${teachers.find(t => t.id.toString() === formTeacherId)?.user?.nom}`
+                      : 'No teacher selected'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-white border-neutral-200">
+                  {teachers.map((t: Teacher) => (
+                    <SelectItem key={t.id} value={t.id.toString()}>
+                      {t.user?.prenom} {t.user?.nom} ({t.specialite})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formMatiereId && classSubjects && !classSubjects.find(cs => cs.matiere_id.toString() === formMatiereId)?.enseignant_id && (
+                <div className="text-[10px] text-amber-600 bg-amber-50/50 border border-amber-200/50 rounded-lg p-2.5 flex items-start gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>No teacher assigned for this subject in this class. Please assign one in Class Details first.</span>
+                </div>
+              )}
             </div>
 
             {/* Day Selector */}

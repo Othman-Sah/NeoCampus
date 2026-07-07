@@ -53,5 +53,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Library Policy
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Livre::class, \App\Policies\LibraryPolicy::class);
+
+        // Bulletin Policy
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Bulletin::class, \App\Policies\BulletinPolicy::class);
+
+        // Examen Policy
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Examen::class, \App\Policies\ExamenPolicy::class);
     }
 }

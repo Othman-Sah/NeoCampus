@@ -15,8 +15,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'classe_id',
     'matiere_id',
     'status',
+    'periode',
     'fichier_sujet',
-    'etablissement_id'
+    'etablissement_id',
+    'type_evaluation_id',
+    'poids'
 ])]
 class Examen extends Model
 {
@@ -26,7 +29,13 @@ class Examen extends Model
 
     protected $casts = [
         'date' => 'datetime',
+        'poids' => 'float',
     ];
+
+    public function typeEvaluation(): BelongsTo
+    {
+        return $this->belongsTo(TypeEvaluation::class, 'type_evaluation_id');
+    }
 
     public function classe(): BelongsTo
     {

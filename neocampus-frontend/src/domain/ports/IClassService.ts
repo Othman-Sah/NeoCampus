@@ -1,4 +1,4 @@
-import { Class } from '../entities/Class';
+import { Class, ClassMatiereAssignment } from '../entities/Class';
 import { Section } from '../entities/Section';
 
 export interface IClassService {
@@ -15,4 +15,12 @@ export interface IClassService {
 
   // Academic years
   findAllAcademicYears(): Promise<any[]>;
+
+  // Class Subjects Management
+  getClassMatieres(classeId: number): Promise<ClassMatiereAssignment[]>;
+  addMatiereToClass(classeId: number, matiereId: number): Promise<void>;
+  removeMatiereFromClass(classeId: number, matiereId: number): Promise<void>;
+  assignTeacherToMatiere(classeId: number, matiereId: number, enseignantId: number): Promise<void>;
+  setClassMatiereCoefficient(classeId: number, matiereId: number, coefficient: number): Promise<void>;
+  getMatieresWithEnseignants(classeId: number): Promise<any[]>;
 }

@@ -26,6 +26,8 @@ class EloquentExamenRepository implements ExamenPortInterface
                 'matiere_id' => $data['matiere_id'],
                 'status' => 'draft',
                 'etablissement_id' => $tenantId,
+                'type_evaluation_id' => $data['type_evaluation_id'] ?? null,
+                'poids' => $data['poids'] ?? null,
             ]);
 
             // 2. Create the schedule request
@@ -165,7 +167,6 @@ class EloquentExamenRepository implements ExamenPortInterface
             return [];
         }
 
-        // Get exams corresponding to teacher's assigned classes/subjects
         $teacher = \App\Models\Enseignant::find($enseignantId);
         if (!$teacher) {
             return [];
@@ -174,10 +175,19 @@ class EloquentExamenRepository implements ExamenPortInterface
         $classIds = $teacher->classes()->pluck('classes.id')->toArray();
         $subjectIds = $teacher->matieres()->pluck('matieres.id')->toArray();
 
+        // Also fetch any exams proposed by this teacher (via demandes_plannification_examens)
+        $proposedExamIds = \App\Models\DemandePlannificationExamen::where('enseignant_id', $enseignantId)
+            ->pluck('examen_id')
+            ->toArray();
+
         return Examen::with(['classe', 'matiere'])
-            ->whereIn('classe_id', $classIds)
-            ->whereIn('matiere_id', $subjectIds)
             ->where('etablissement_id', $tenantId)
+            ->where(function($q) use ($classIds, $subjectIds, $proposedExamIds) {
+                $q->where(function($inner) use ($classIds, $subjectIds) {
+                    $inner->whereIn('classe_id', $classIds)
+                          ->whereIn('matiere_id', $subjectIds);
+                })->orWhereIn('id', $proposedExamIds);
+            })
             ->get()
             ->all();
     }

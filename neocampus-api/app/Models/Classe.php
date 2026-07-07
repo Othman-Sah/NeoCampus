@@ -62,6 +62,16 @@ class Classe extends Model
     }
 
     /**
+     * Get subjects assigned to this class.
+     */
+    public function matieres(): BelongsToMany
+    {
+        return $this->belongsToMany(Matiere::class, 'classe_matiere', 'classe_id', 'matiere_id')
+            ->withPivot('etablissement_id')
+            ->withTimestamps();
+    }
+
+    /**
      * Get teachers assigned to this class.
      */
     public function enseignants(): BelongsToMany

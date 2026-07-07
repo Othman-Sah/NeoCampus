@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'valeur',
+    'absent_justifie',
     'examen_id',
     'eleve_id',
     'etablissement_id'
@@ -22,6 +23,7 @@ class Note extends Model
 
     protected $casts = [
         'valeur' => 'float',
+        'absent_justifie' => 'boolean',
     ];
 
     public function examen(): BelongsTo

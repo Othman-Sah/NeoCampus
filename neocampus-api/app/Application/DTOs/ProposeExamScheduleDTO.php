@@ -8,6 +8,8 @@ class ProposeExamScheduleDTO
     public int $classe_id;
     public int $matiere_id;
     public string $date_proposee;
+    public ?int $type_evaluation_id;
+    public ?float $poids;
 
     public function __construct(array $data)
     {
@@ -15,6 +17,8 @@ class ProposeExamScheduleDTO
         $this->classe_id = (int)$data['classe_id'];
         $this->matiere_id = (int)$data['matiere_id'];
         $this->date_proposee = $data['date_proposee'];
+        $this->type_evaluation_id = isset($data['type_evaluation_id']) ? (int)$data['type_evaluation_id'] : null;
+        $this->poids = isset($data['poids']) ? (float)$data['poids'] : null;
     }
 
     public static function fromArray(array $data): self
@@ -29,6 +33,8 @@ class ProposeExamScheduleDTO
             'classe_id' => $this->classe_id,
             'matiere_id' => $this->matiere_id,
             'date_proposee' => $this->date_proposee,
+            'type_evaluation_id' => $this->type_evaluation_id,
+            'poids' => $this->poids,
         ];
     }
 }

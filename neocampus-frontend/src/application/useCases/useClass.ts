@@ -69,6 +69,59 @@ export const useClass = (filters: Record<string, string> = {}) => {
     },
   })
 
+  const addMatiereMutation = useMutation({
+    mutationFn: ({ classeId, matiereId }: { classeId: number; matiereId: number }) =>
+      classApiService.addMatiereToClass(classeId, matiereId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['class-matieres', variables.classeId] })
+      queryClient.invalidateQueries({ queryKey: ['class', variables.classeId] })
+      queryClient.invalidateQueries({ queryKey: ['classes'] })
+    }
+  })
+
+  const removeMatiereMutation = useMutation({
+    mutationFn: ({ classeId, matiereId }: { classeId: number; matiereId: number }) =>
+      classApiService.removeMatiereFromClass(classeId, matiereId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['class-matieres', variables.classeId] })
+      queryClient.invalidateQueries({ queryKey: ['class', variables.classeId] })
+      queryClient.invalidateQueries({ queryKey: ['classes'] })
+    }
+  })
+
+  const assignTeacherMutation = useMutation({
+    mutationFn: ({ classeId, matiereId, enseignantId }: { classeId: number; matiereId: number; enseignantId: number }) =>
+      classApiService.assignTeacherToMatiere(classeId, matiereId, enseignantId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['class-matieres', variables.classeId] })
+      queryClient.invalidateQueries({ queryKey: ['teachers'] })
+    }
+  })
+
+  const setCoefficientMutation = useMutation({
+    mutationFn: ({ classeId, matiereId, coefficient }: { classeId: number; matiereId: number; coefficient: number }) =>
+      classApiService.setClassMatiereCoefficient(classeId, matiereId, coefficient),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['class-matieres', variables.classeId] })
+    }
+  })
+
+  const useClassMatieres = (classeId: number) => {
+    return useQuery({
+      queryKey: ['class-matieres', classeId],
+      queryFn: () => classApiService.getClassMatieres(classeId),
+      enabled: !!classeId && classeId > 0,
+    })
+  }
+
+  const useClassMatieresWithEnseignants = (classeId: number) => {
+    return useQuery({
+      queryKey: ['class-matieres-with-enseignants', classeId],
+      queryFn: () => classApiService.getMatieresWithEnseignants(classeId),
+      enabled: !!classeId && classeId > 0,
+    })
+  }
+
   return {
     classes: classesQuery.data ?? [],
     loadingClasses: classesQuery.isLoading,
@@ -77,6 +130,8 @@ export const useClass = (filters: Record<string, string> = {}) => {
     years: yearsQuery.data ?? [],
     loadingYears: yearsQuery.isLoading,
     useClassDetails,
+    useClassMatieres,
+    useClassMatieresWithEnseignants,
     
     createClass: createClassMutation.mutateAsync,
     creatingClass: createClassMutation.isPending,
@@ -89,6 +144,15 @@ export const useClass = (filters: Record<string, string> = {}) => {
     creatingSection: createSectionMutation.isPending,
     deleteSection: deleteSectionMutation.mutateAsync,
     deletingSection: deleteSectionMutation.isPending,
+
+    addMatiere: addMatiereMutation.mutateAsync,
+    addingMatiere: addMatiereMutation.isPending,
+    removeMatiere: removeMatiereMutation.mutateAsync,
+    removingMatiere: removeMatiereMutation.isPending,
+    assignTeacher: assignTeacherMutation.mutateAsync,
+    assigningTeacher: assignTeacherMutation.isPending,
+    setCoefficient: setCoefficientMutation.mutateAsync,
+    settingCoefficient: setCoefficientMutation.isPending,
   }
 }
 

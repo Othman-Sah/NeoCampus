@@ -18,6 +18,8 @@ class ProposeExamScheduleRequest extends FormRequest
             'classe_id' => 'required|integer|exists:classes,id',
             'matiere_id' => 'required|integer|exists:matieres,id',
             'date_proposee' => 'required|date',
+            'type_evaluation_id' => 'nullable|integer|exists:type_evaluations,id',
+            'poids' => 'nullable|numeric|min:0',
         ];
     }
 }

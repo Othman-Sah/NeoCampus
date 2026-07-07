@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     'etablissement_id',
     'nom',
     'code',
-    'intitule'
+    'intitule',
+    'coefficient',
+    'groupe_matiere_id',
+    'ordre_dans_groupe'
 ])]
 class Matiere extends Model
 {
@@ -22,6 +25,11 @@ class Matiere extends Model
     protected $table = 'matieres';
 
     protected $appends = ['intitule'];
+
+    protected $casts = [
+        'coefficient' => 'float',
+        'ordre_dans_groupe' => 'integer',
+    ];
 
     protected static function booted(): void
     {
@@ -36,6 +44,18 @@ class Matiere extends Model
     public function etablissement(): BelongsTo
     {
         return $this->belongsTo(Etablissement::class);
+    }
+
+    public function groupeMatiere(): BelongsTo
+    {
+        return $this->belongsTo(GroupeMatiere::class, 'groupe_matiere_id');
+    }
+
+    public function classes(): BelongsToMany
+    {
+        return $this->belongsToMany(Classe::class, 'classe_matiere', 'matiere_id', 'classe_id')
+            ->withPivot('etablissement_id')
+            ->withTimestamps();
     }
 
     public function enseignants(): BelongsToMany

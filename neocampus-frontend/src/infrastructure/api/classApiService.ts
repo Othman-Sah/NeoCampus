@@ -1,5 +1,5 @@
 import { IClassService } from '@/domain/ports/IClassService'
-import { Class } from '@/domain/entities/Class'
+import { Class, ClassMatiereAssignment } from '@/domain/entities/Class'
 import { Section } from '@/domain/entities/Section'
 import { axiosClient } from './axiosClient'
 
@@ -195,4 +195,30 @@ export const classApiService: IClassService = {
       throw err;
     }
   },
+
+  async getClassMatieres(classeId: number): Promise<ClassMatiereAssignment[]> {
+    const response = await axiosClient.get<{ data: ClassMatiereAssignment[] }>(`/admin/classes/${classeId}/matieres`);
+    return response.data.data;
+  },
+
+  async addMatiereToClass(classeId: number, matiereId: number): Promise<void> {
+    await axiosClient.post(`/admin/classes/${classeId}/matieres`, { matiere_id: matiereId });
+  },
+
+  async removeMatiereFromClass(classeId: number, matiereId: number): Promise<void> {
+    await axiosClient.delete(`/admin/classes/${classeId}/matieres/${matiereId}`);
+  },
+
+  async assignTeacherToMatiere(classeId: number, matiereId: number, enseignantId: number): Promise<void> {
+    await axiosClient.put(`/admin/classes/${classeId}/matieres/${matiereId}/enseignant`, { enseignant_id: enseignantId });
+  },
+
+  async setClassMatiereCoefficient(classeId: number, matiereId: number, coefficient: number): Promise<void> {
+    await axiosClient.put(`/admin/classes/${classeId}/matieres/${matiereId}/coefficient`, { coefficient });
+  },
+
+  async getMatieresWithEnseignants(classeId: number): Promise<any[]> {
+    const response = await axiosClient.get<{ data: any[] }>(`/admin/classes/${classeId}/matieres-with-enseignants`);
+    return response.data.data;
+  }
 }

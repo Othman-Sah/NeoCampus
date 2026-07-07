@@ -66,6 +66,14 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
         Route::delete('enseignants/{enseignant}', [\App\Http\Controllers\Api\TeacherController::class, 'destroy']);
         Route::post('/enseignants/{id}/reveal-password', [\App\Http\Controllers\Api\TeacherController::class, 'revealPassword']);
         Route::apiResource('accountants', \App\Http\Controllers\Api\AccountantController::class);
+
+        // Class Subjects Management
+        Route::get('classes/{id}/matieres', [\App\Http\Controllers\Api\ClassController::class, 'getMatieres']);
+        Route::post('classes/{id}/matieres', [\App\Http\Controllers\Api\ClassController::class, 'addMatiere']);
+        Route::delete('classes/{id}/matieres/{matiereId}', [\App\Http\Controllers\Api\ClassController::class, 'removeMatiere']);
+        Route::put('classes/{id}/matieres/{matiereId}/enseignant', [\App\Http\Controllers\Api\ClassController::class, 'updateTeacher']);
+        Route::put('classes/{id}/matieres/{matiereId}/coefficient', [\App\Http\Controllers\Api\ClassController::class, 'updateCoefficient']);
+        Route::get('classes/{id}/matieres-with-enseignants', [\App\Http\Controllers\Api\ClassController::class, 'getMatieresWithEnseignants']);
     });
 
     // Comptable (Finance) Routes
@@ -150,8 +158,37 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
     });
 
     // --- Bulletins Module ---
+    Route::middleware('role:admin')->prefix('bulletins')->group(function () {
+        Route::post('/generate/bulk', [\App\Http\Controllers\Api\BulletinController::class, 'generateBulk']);
+        Route::post('/generate/single', [\App\Http\Controllers\Api\BulletinController::class, 'generateSingle']);
+        Route::put('/{id}/publish', [\App\Http\Controllers\Api\BulletinController::class, 'publish']);
+        Route::put('/{id}/decision', [\App\Http\Controllers\Api\BulletinController::class, 'updateDecision']);
+        Route::put('/{id}/validate', [\App\Http\Controllers\Api\BulletinController::class, 'validateBulletin']);
+    });
+
     Route::middleware('role:admin')->group(function () {
-        Route::post('/bulletins/generate', [\App\Http\Controllers\Api\BulletinController::class, 'generate']);
+        Route::get('/bulletin-config', [\App\Http\Controllers\Api\BulletinConfigController::class, 'show']);
+        Route::put('/bulletin-config', [\App\Http\Controllers\Api\BulletinConfigController::class, 'update']);
+
+        Route::get('/coefficient-classe-matiere', [\App\Http\Controllers\Api\CoefficientClasseMatiereController::class, 'index']);
+        Route::post('/coefficient-classe-matiere', [\App\Http\Controllers\Api\CoefficientClasseMatiereController::class, 'store']);
+        Route::delete('/coefficient-classe-matiere', [\App\Http\Controllers\Api\CoefficientClasseMatiereController::class, 'destroy']);
+
+        Route::apiResource('type-evaluations', \App\Http\Controllers\Api\TypeEvaluationController::class);
+        Route::apiResource('groupe-matieres', \App\Http\Controllers\Api\GroupeMatiereController::class);
+    });
+
+    Route::middleware('role:admin,comptable')->group(function () {
+        Route::get('/classes/{id}/bulletins', [\App\Http\Controllers\Api\BulletinController::class, 'classBulletins']);
+    });
+
+    Route::middleware('role:enseignant,admin')->group(function () {
+        Route::put('/bulletins/{id}/appreciations', [\App\Http\Controllers\Api\BulletinController::class, 'updateAppreciations']);
+    });
+
+    Route::middleware('role:admin,enseignant,parent,eleve')->group(function () {
+        Route::get('/my-bulletins', [\App\Http\Controllers\Api\BulletinController::class, 'getMyBulletins']);
+        Route::get('/bulletins/{id}', [\App\Http\Controllers\Api\BulletinController::class, 'show']);
     });
 
     // --- Library Module ---

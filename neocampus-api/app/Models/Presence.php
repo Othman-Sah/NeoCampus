@@ -14,13 +14,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'statut',
     'motif',
     'date',
-    'etablissement_id'
+    'etablissement_id',
+    'justifie'
 ])]
 class Presence extends Model
 {
     use HasFactory, Multitenant;
 
     protected $table = 'presences';
+
+    protected $casts = [
+        'justifie' => 'boolean',
+    ];
 
     public function seance(): BelongsTo
     {

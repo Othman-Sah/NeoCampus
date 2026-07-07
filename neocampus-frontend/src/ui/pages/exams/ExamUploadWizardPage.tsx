@@ -14,7 +14,8 @@ import {
   ArrowRight, 
   ArrowLeft,
   Loader2,
-  Trash2
+  Trash2,
+  AlertCircle
 } from 'lucide-react'
 
 export const ExamUploadWizardPage: React.FC = () => {
@@ -31,6 +32,7 @@ export const ExamUploadWizardPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   // Step 1: gabarit settings
   const hasTemplate = !!settings?.template_sujet_path
@@ -77,6 +79,7 @@ export const ExamUploadWizardPage: React.FC = () => {
 
   const handleRemoveFile = () => {
     setSelectedFile(null)
+    setError(null)
     if (filePreviewUrl) {
       URL.revokeObjectURL(filePreviewUrl)
       setFilePreviewUrl(null)
@@ -91,14 +94,16 @@ export const ExamUploadWizardPage: React.FC = () => {
 
   const handleSubmitSujet = async () => {
     if (!selectedFile) return
+    setError(null)
     try {
       await uploadSujet({
         id: examId,
         file: selectedFile,
       })
       setStep(4) // Move to confirmation
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      setError(err.response?.data?.message || err.message || 'Failed to upload the subject file.')
     }
   }
 
@@ -285,6 +290,13 @@ export const ExamUploadWizardPage: React.FC = () => {
             </div>
           )}
 
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl font-bold uppercase tracking-wider flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+              {error}
+            </div>
+          )}
+
         </CardContent>
 
         {/* Wizard Footer Controls */}
@@ -295,7 +307,10 @@ export const ExamUploadWizardPage: React.FC = () => {
                 type="button"
                 variant="outline"
                 disabled={step === 1}
-                onClick={() => setStep(prev => prev - 1)}
+                onClick={() => {
+                  setError(null)
+                  setStep(prev => prev - 1)
+                }}
                 className="rounded-xl font-bold text-xs gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />

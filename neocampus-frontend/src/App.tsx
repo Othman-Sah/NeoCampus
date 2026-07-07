@@ -29,6 +29,7 @@ import { AttendanceSheetPage } from '@/ui/pages/attendance/AttendanceSheetPage'
 import { GradeEntrySheetPage } from '@/ui/pages/grades/GradeEntrySheetPage'
 import { ExamUploadWizardPage } from '@/ui/pages/exams/ExamUploadWizardPage'
 import { AdminExamManagementPage } from '@/ui/pages/exams/AdminExamManagementPage'
+import { TeacherExamManagementPage } from '@/ui/pages/exams/TeacherExamManagementPage'
 import { AttendanceDashboardPage } from '@/ui/pages/attendance/AttendanceDashboardPage'
 import { GradesDashboardPage } from '@/ui/pages/grades/GradesDashboardPage'
 import LibraryDashboard from '@/ui/pages/library/LibraryDashboard'
@@ -38,6 +39,10 @@ import LibraryMembers from '@/ui/pages/library/LibraryMembers'
 import LibraryFines from '@/ui/pages/library/LibraryFines'
 import LibraryAnalytics from '@/ui/pages/library/LibraryAnalytics'
 import LibrarySettings from '@/ui/pages/library/LibrarySettings'
+import AdminDashboard from '@/ui/pages/bulletins/AdminDashboard'
+import AppreciationEditor from '@/ui/pages/bulletins/AppreciationEditor'
+import BulletinPrintView from '@/ui/pages/bulletins/BulletinPrintView'
+import BulletinSettingsPage from '@/ui/pages/bulletins/BulletinSettingsPage'
 
 export const App: React.FC = () => {
   return (
@@ -56,7 +61,9 @@ export const App: React.FC = () => {
             <Route path="/attendance" element={<AttendanceDashboardPage />} />
             <Route path="/grades" element={<GradesDashboardPage />} />
             <Route path="/announcements" element={<PlaceholderPage />} />
-            <Route path="/bulletins" element={<PlaceholderPage />} />
+            <Route path="/bulletins" element={<AdminDashboard />} />
+            <Route path="/bulletins/:id" element={<BulletinPrintView />} />
+            <Route path="/bulletins/:id/appreciations" element={<AppreciationEditor />} />
             <Route path="/transport" element={<PlaceholderPage />} />
           </Route>
         </Route>
@@ -77,6 +84,7 @@ export const App: React.FC = () => {
              <Route path="/admin/classes" element={<ClassesPage />} />
              <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
              <Route path="/admin/exams" element={<AdminExamManagementPage />} />
+             <Route path="/bulletins/settings" element={<BulletinSettingsPage />} />
           </Route>
         </Route>
 
@@ -99,6 +107,7 @@ export const App: React.FC = () => {
             <Route path="/teacher/attendance/:seanceId" element={<AttendanceSheetPage />} />
             <Route path="/teacher/grades/:examenId" element={<GradeEntrySheetPage />} />
             <Route path="/teacher/exams/upload/:id" element={<ExamUploadWizardPage />} />
+            <Route path="/teacher/exams" element={<TeacherExamManagementPage />} />
           </Route>
         </Route>
 

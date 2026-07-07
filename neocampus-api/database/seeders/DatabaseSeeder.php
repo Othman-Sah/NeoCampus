@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nom' => 'Groupe Scolaire EMSI',
                 'adresse' => 'Casablanca, Maroc',
+                'logo' => 'https://emsi.ma/wp-content/uploads/2020/07/logo-emsi.png',
             ]
         );
 
@@ -61,6 +62,7 @@ class DatabaseSeeder extends Seeder
             ExamParamSeeder::class,
             FinanceSeeder::class,
             LibrarySeeder::class,
+            TypeEvaluationSeeder::class,
         ]);
     }
 }

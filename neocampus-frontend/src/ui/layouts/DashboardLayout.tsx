@@ -62,11 +62,12 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           nameKey: 'pedagogy',
           icon: BookOpen,
           hasSubmenu: true,
-          gridCols: 'grid-cols-3',
+          gridCols: 'grid-cols-2',
           items: [
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
             { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
+            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
           ]
         },
         { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
@@ -81,11 +82,12 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           nameKey: 'pedagogy',
           icon: BookOpen,
           hasSubmenu: true,
-          gridCols: 'grid-cols-3',
+          gridCols: 'grid-cols-2',
           items: [
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
             { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
+            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
           ]
         },
         { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
@@ -104,9 +106,11 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           items: [
             { nameKey: 'submenu_classes', path: '/admin/classes', icon: BookMarked },
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
+            { nameKey: 'submenu_exams', path: '/teacher/exams', icon: FileText },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
             { nameKey: 'submenu_salaries', path: '/teacher/salaires', icon: FileText },
+            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
           ]
         },
         { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
@@ -127,6 +131,7 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
             { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
             { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
             { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
+            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
           ]
         },
         {

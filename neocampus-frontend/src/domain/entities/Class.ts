@@ -8,3 +8,16 @@ export interface Class {
   students_count?: number;
   teachers_count?: number;
 }
+
+export interface ClassMatiereAssignment {
+  matiere_id: number;
+  nom: string;
+  code: string;
+  coefficient_global: number;
+  coefficient_classe: number | null;
+  enseignant: {
+    id: number;
+    nom: string;
+    prenom: string;
+  } | null;
+}

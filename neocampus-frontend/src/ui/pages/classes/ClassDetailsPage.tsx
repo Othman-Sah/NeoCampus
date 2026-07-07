@@ -16,6 +16,22 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { 
   ArrowLeft, 
   Users, 
@@ -23,7 +39,11 @@ import {
   Search,
   Eye,
   Edit3,
-  Sparkles
+  Sparkles,
+  Plus,
+  Trash2,
+  AlertTriangle,
+  CheckCircle2
 } from 'lucide-react'
 
 export const ClassDetailsPage: React.FC = () => {
@@ -31,13 +51,47 @@ export const ClassDetailsPage: React.FC = () => {
   const navigate = useNavigate()
   const classId = parseInt(id || '0')
 
-  const { useClassDetails } = useClass()
+  const { 
+    useClassDetails, 
+    useClassMatieres, 
+    addMatiere, 
+    removeMatiere, 
+    assignTeacher, 
+    setCoefficient 
+  } = useClass()
+
   const { data: classe, isLoading: loadingClass } = useClassDetails(classId)
+  const { data: classMatieres, isLoading: loadingMatieres } = useClassMatieres(classId)
 
   const [searchTerm, setSearchTerm] = useState('')
   const { students, loading: loadingStudents } = useStudent({ classe_id: classId.toString() })
+  const { teachers, subjects } = useTeacher()
+
+  // Modal states
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editingSubject, setEditingSubject] = useState<any>(null)
   
-  const { teachers, loadingTeachers } = useTeacher()
+  const [editTeacherId, setEditTeacherId] = useState('')
+  const [editCoef, setEditCoef] = useState('')
+  
+  const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  // Clear messages automatically
+  React.useEffect(() => {
+    if (successMsg) {
+      const timer = setTimeout(() => setSuccessMsg(null), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [successMsg])
+
+  React.useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => setErrorMsg(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [errorMsg])
 
   const filteredStudents = students.filter(s => 
     s.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -45,9 +99,62 @@ export const ClassDetailsPage: React.FC = () => {
     s.matricule.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const assignedTeachers = teachers.filter(t => 
-    t.classes?.some(c => c.classe_id === classId)
+  const unassignedSubjects = subjects.filter(sub => 
+    !classMatieres?.some((cm: any) => cm.matiere_id === sub.id)
   )
+
+  const handleAddSubject = async (matiereId: number) => {
+    setErrorMsg(null)
+    setSuccessMsg(null)
+    try {
+      await addMatiere({ classeId: classId, matiereId })
+      setSuccessMsg("Subject added to class successfully.")
+      setIsAddOpen(false)
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message || err.message || "Failed to add subject.")
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingSubject) return
+    setErrorMsg(null)
+    setSuccessMsg(null)
+    try {
+      const promises = []
+      if (editTeacherId && editTeacherId !== 'none') {
+        promises.push(assignTeacher({
+          classeId: classId,
+          matiereId: editingSubject.matiere_id,
+          enseignantId: Number(editTeacherId)
+        }))
+      }
+      if (editCoef !== '') {
+        promises.push(setCoefficient({
+          classeId: classId,
+          matiereId: editingSubject.matiere_id,
+          coefficient: Number(editCoef)
+        }))
+      }
+      await Promise.all(promises)
+      setSuccessMsg("Subject configuration updated successfully.")
+      setIsEditOpen(false)
+      setEditingSubject(null)
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message || err.message || "Failed to save configuration.")
+    }
+  }
+
+  const handleDeleteSubject = async (matiereId: number) => {
+    if (!window.confirm("Are you sure you want to remove this subject from this class? This will delete teacher workload and per-class coefficients.")) return
+    setErrorMsg(null)
+    setSuccessMsg(null)
+    try {
+      await removeMatiere({ classeId: classId, matiereId })
+      setSuccessMsg("Subject removed from class successfully.")
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message || err.message || "Failed to remove subject.")
+    }
+  }
 
   if (loadingClass) {
     return (
@@ -101,8 +208,25 @@ export const ClassDetailsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Success / Error alerts */}
+      {successMsg && (
+        <Alert className="border-green-200 bg-green-50 text-green-800 rounded-xl">
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <AlertTitle className="text-xs font-black uppercase tracking-wider text-green-900">Success</AlertTitle>
+          <AlertDescription className="text-xs text-neutral-600 mt-0.5">{successMsg}</AlertDescription>
+        </Alert>
+      )}
+
+      {errorMsg && (
+        <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800 rounded-xl">
+          <AlertTriangle className="h-4 w-4 text-red-650" />
+          <AlertTitle className="text-xs font-black uppercase tracking-wider text-red-950">Error</AlertTitle>
+          <AlertDescription className="text-xs text-red-700 mt-0.5">{errorMsg}</AlertDescription>
+        </Alert>
+      )}
+
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Enrolled Students KPI */}
         <Card className="bg-white border border-[#E5E7EB] rounded-xl shadow-sm">
           <CardContent className="p-4 flex items-center gap-4">
@@ -153,7 +277,24 @@ export const ClassDetailsPage: React.FC = () => {
                 Assigned Teachers
               </p>
               <p className="text-xl font-black text-neutral-900 leading-tight">
-                {assignedTeachers.length} Faculty
+                {classMatieres?.filter(cm => cm.enseignant).length ?? 0} Faculty
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subjects Assigned KPI */}
+        <Card className="bg-white border border-[#E5E7EB] rounded-xl shadow-sm">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-neutral-50 border border-neutral-100 flex items-center justify-center text-neutral-500">
+              <GraduationCap className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-extrabold text-neutral-450 uppercase tracking-wider leading-none mb-1">
+                Subjects Assigned
+              </p>
+              <p className="text-xl font-black text-neutral-900 leading-tight">
+                {classMatieres?.length ?? 0} Subjects
               </p>
             </div>
           </CardContent>
@@ -264,57 +405,175 @@ export const ClassDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Pedagogic Team */}
+        {/* Right Side: Subjects & Teaching Assignments */}
         <div className="space-y-4">
-          <h3 className="text-xs font-black uppercase tracking-wider text-neutral-800 flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#d0f137]" />
-            Pedagogic Team
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-xs font-black uppercase tracking-wider text-neutral-800 flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#d0f137]" />
+              Subjects & Assignments
+            </h3>
+            <Button
+              onClick={() => setIsAddOpen(true)}
+              className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg h-7 px-3 flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="h-3 w-3" />
+              Add Subject
+            </Button>
+          </div>
 
           <div className="bg-white border border-[#E5E7EB] rounded-xl shadow-sm overflow-hidden p-4 space-y-4">
-            {loadingTeachers ? (
-              <div className="text-center py-6 text-neutral-450 text-xs font-bold uppercase tracking-widest">
+            {loadingMatieres ? (
+              <div className="text-center py-6 text-neutral-450 text-xs font-bold uppercase tracking-widest animate-pulse">
                 Loading...
               </div>
-            ) : assignedTeachers.length > 0 ? (
-              assignedTeachers.map((t) => {
-                const classAssignment = t.classes?.find(c => c.classe_id === classId)
-                return (
-                  <div key={t.id} className="flex items-center justify-between pb-3 border-b border-neutral-50 last:border-b-0 last:pb-0">
-                    <div className="flex items-center gap-2.5">
-                      <Avatar className="h-8 w-8 border border-neutral-100">
-                        <AvatarFallback className="bg-neutral-900 text-white text-[10px] font-black uppercase">
-                          {t.user?.nom.charAt(0)}{t.user?.prenom.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="text-left">
-                        <p className="text-xs font-extrabold text-neutral-800 uppercase leading-none mb-1">
-                          {t.user?.prenom} {t.user?.nom}
-                        </p>
-                        <p className="text-[9px] font-black text-[#d0f137] bg-black uppercase tracking-widest rounded px-1.5 py-0.5 inline-block leading-none border-none">
-                          {classAssignment?.matiere_nom || t.specialite}
-                        </p>
+            ) : classMatieres && classMatieres.length > 0 ? (
+              <div className="space-y-3">
+                {classMatieres.map((item) => (
+                  <div key={item.matiere_id} className="flex items-center justify-between pb-3 border-b border-neutral-100 last:border-b-0 last:pb-0">
+                    <div className="space-y-1">
+                      <p className="text-xs font-extrabold text-neutral-800 uppercase leading-none">
+                        {item.nom} <span className="text-neutral-450 font-bold text-[9px]">({item.code})</span>
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-[9px] font-black text-black bg-[#d0f137] uppercase tracking-widest rounded px-1.5 py-0.5 leading-none">
+                          Coef: {item.coefficient_classe !== null ? item.coefficient_classe : item.coefficient_global}
+                        </span>
+                        {item.coefficient_classe !== null && (
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider">
+                            (Global: {item.coefficient_global})
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1.5">
+                        {item.enseignant ? (
+                          <span className="text-[10px] font-bold text-neutral-500 uppercase">
+                            Teacher: {item.enseignant.prenom} {item.enseignant.nom}
+                          </span>
+                        ) : (
+                          <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3 text-amber-600" />
+                            No teacher
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <Button
-                      onClick={() => navigate('/admin/teachers')}
-                      variant="ghost"
-                      className="h-7 text-[10px] font-black uppercase text-neutral-400 hover:text-black tracking-wider leading-none p-2 hover:bg-neutral-50 cursor-pointer"
-                    >
-                      Manage
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingSubject(item)
+                          setEditTeacherId(item.enseignant?.id.toString() || '')
+                          setEditCoef(item.coefficient_classe !== null ? item.coefficient_classe.toString() : '')
+                          setIsEditOpen(true)
+                        }}
+                        className="h-7 w-7 p-0 rounded-md hover:bg-neutral-50 cursor-pointer"
+                      >
+                        <Edit3 className="h-3.5 w-3.5 text-neutral-400 hover:text-black" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteSubject(item.matiere_id)}
+                        className="h-7 w-7 p-0 rounded-md hover:bg-neutral-50 cursor-pointer text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-neutral-400 hover:text-red-600" />
+                      </Button>
+                    </div>
                   </div>
-                )
-              })
+                ))}
+              </div>
             ) : (
-              <div className="text-center py-8 text-neutral-400 text-xs font-bold uppercase tracking-wider">
-                No teachers assigned
+              <div className="text-center py-8 text-neutral-450 text-xs font-bold uppercase tracking-wider">
+                No subjects assigned
               </div>
             )}
           </div>
         </div>
 
       </div>
+
+      {/* Add Subject Dialog */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="bg-white text-neutral-900 border border-neutral-100">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xs font-black uppercase tracking-wider">Add Subject to Class</DialogTitle>
+            <DialogDescription className="text-xs text-neutral-400">Select a subject to link to {classe.nom}.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-xs font-extrabold uppercase tracking-wider text-neutral-450 block">Subject</label>
+              <Select onValueChange={(val) => handleAddSubject(Number(val))}>
+                <SelectTrigger className="bg-white border-neutral-200 text-xs h-9">
+                  <SelectValue placeholder="Select a subject..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-neutral-100 text-xs text-neutral-900">
+                  {unassignedSubjects.map((sub: any) => (
+                    <SelectItem key={sub.id} value={sub.id.toString()} className="hover:bg-neutral-50 focus:bg-neutral-50 text-neutral-900">
+                      {sub.nom} ({sub.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="text-xs font-bold uppercase tracking-wider h-9">
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Subject Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="bg-white text-neutral-900 border border-neutral-100">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xs font-black uppercase tracking-wider">Configure Subject Assignment</DialogTitle>
+            <DialogDescription className="text-xs text-neutral-400">Update teacher workload and coefficient override for {editingSubject?.nom}.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4 text-left">
+            <div className="space-y-2">
+              <label className="text-xs font-extrabold uppercase tracking-wider text-neutral-450 block">Assign Teacher</label>
+              <Select value={editTeacherId} onValueChange={(val) => setEditTeacherId(val)}>
+                <SelectTrigger className="bg-white border-neutral-200 text-xs h-9">
+                  <SelectValue placeholder="Select a teacher..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-neutral-100 text-xs text-neutral-900">
+                  <SelectItem value="none" className="hover:bg-neutral-50 focus:bg-neutral-50 text-neutral-500 italic">No Teacher Assigned</SelectItem>
+                  {teachers.map((t: any) => (
+                    <SelectItem key={t.id} value={t.id.toString()} className="hover:bg-neutral-50 focus:bg-neutral-50 text-neutral-900">
+                      {t.user?.prenom} {t.user?.nom}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-extrabold uppercase tracking-wider text-neutral-450 block">Class Coefficient Override (Optional)</label>
+              <Input
+                type="number"
+                step="0.1"
+                placeholder={`Default: ${editingSubject?.coefficient_global}`}
+                value={editCoef}
+                onChange={(e) => setEditCoef(e.target.value)}
+                className="bg-white border-neutral-200 text-xs h-9"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => { setIsEditOpen(false); setEditingSubject(null); }} className="text-xs font-bold uppercase tracking-wider h-9">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              className="bg-black hover:bg-neutral-800 text-white font-bold text-xs h-9 px-4 rounded-lg"
+            >
+              Save Configuration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   )
