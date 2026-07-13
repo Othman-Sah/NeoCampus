@@ -263,10 +263,13 @@ class BulletinController extends Controller
                     ->get();
             }
         } elseif ($user->role === 'parent') {
-            $students = \App\Models\Eleve::where('parent_contact->email', $user->email)->get();
-            if ($students->isNotEmpty()) {
+            $pivotStudentIds = $user->children()->pluck('eleves.id');
+            $jsonStudentIds = \App\Models\Eleve::where('parent_contact->email', $user->email)->pluck('id');
+            $studentIds = $pivotStudentIds->merge($jsonStudentIds)->unique()->toArray();
+
+            if (!empty($studentIds)) {
                 $bulletins = Bulletin::with(['eleve', 'classe', 'details.matiere', 'details.prof.user', 'etablissement'])
-                    ->whereIn('eleve_id', $students->pluck('id'))
+                    ->whereIn('eleve_id', $studentIds)
                     ->where('status', 'PUBLISHED')
                     ->get();
             }

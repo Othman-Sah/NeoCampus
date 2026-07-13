@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
         Route::delete('enseignants/{enseignant}', [\App\Http\Controllers\Api\TeacherController::class, 'destroy']);
         Route::post('/enseignants/{id}/reveal-password', [\App\Http\Controllers\Api\TeacherController::class, 'revealPassword']);
         Route::apiResource('accountants', \App\Http\Controllers\Api\AccountantController::class);
+        Route::apiResource('parents', \App\Http\Controllers\Api\Admin\ParentController::class);
 
         // Class Subjects Management
         Route::get('classes/{id}/matieres', [\App\Http\Controllers\Api\ClassController::class, 'getMatieres']);
@@ -116,6 +117,7 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
 
     // Enseignant (Teacher) Routes
     Route::middleware('role:enseignant,admin')->prefix('teacher')->group(function () {
+        Route::get('/me', [\App\Http\Controllers\Api\TeacherController::class, 'me']);
         Route::get('/salaires', [\App\Http\Controllers\Api\SalaryController::class, 'mySalaries']);
     });
 
@@ -217,22 +219,104 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
 
     // Parent Routes
     Route::middleware('role:parent')->prefix('parent')->group(function () {
-        Route::get('/enfants', function () {
-            return response()->json(['message' => 'Children list placeholder.']);
-        });
+        Route::get('/enfants', [\App\Http\Controllers\Api\ParentPortalController::class, 'children']);
+        Route::get('/enfants/{id}/notes', [\App\Http\Controllers\Api\ParentPortalController::class, 'childGrades']);
+        Route::get('/enfants/{id}/presences', [\App\Http\Controllers\Api\ParentPortalController::class, 'childAttendance']);
+        Route::get('/enfants/{id}/emploi-du-temps', [\App\Http\Controllers\Api\ParentPortalController::class, 'childTimetable']);
+        Route::get('/enfants/{id}/solde', [\App\Http\Controllers\Api\ParentPortalController::class, 'childBalance']);
+        Route::get('/enfants/{id}/bulletins', [\App\Http\Controllers\Api\ParentPortalController::class, 'childBulletins']);
+        Route::get('/enfants/{id}/livres', [\App\Http\Controllers\Api\ParentPortalController::class, 'childLoans']);
     });
 
     // Student (Eleve) Routes
     Route::middleware('role:eleve')->prefix('student')->group(function () {
-        Route::get('/dashboard', function () {
-            return response()->json(['message' => 'Student dashboard placeholder.']);
-        });
+        Route::get('/dashboard', [\App\Http\Controllers\Api\StudentPortalController::class, 'dashboard']);
+        Route::get('/notes', [\App\Http\Controllers\Api\StudentPortalController::class, 'grades']);
+        Route::get('/presences', [\App\Http\Controllers\Api\StudentPortalController::class, 'attendance']);
+        Route::get('/emploi-du-temps', [\App\Http\Controllers\Api\StudentPortalController::class, 'timetable']);
+        Route::get('/supports', [\App\Http\Controllers\Api\StudentPortalController::class, 'supports']);
+        Route::get('/devoirs', [\App\Http\Controllers\Api\StudentPortalController::class, 'homework']);
+        Route::get('/livres', [\App\Http\Controllers\Api\StudentPortalController::class, 'loans']);
+    });
+
+    // Teacher course materials / homework write access
+    Route::middleware('role:enseignant,admin')->prefix('teacher')->group(function () {
+        Route::get('/supports', [\App\Http\Controllers\Api\CourseMaterialController::class, 'indexSupports']);
+        Route::post('/supports', [\App\Http\Controllers\Api\CourseMaterialController::class, 'storeSupport']);
+        Route::delete('/supports/{id}', [\App\Http\Controllers\Api\CourseMaterialController::class, 'destroySupport']);
+
+        Route::get('/devoirs', [\App\Http\Controllers\Api\CourseMaterialController::class, 'indexHomework']);
+        Route::post('/devoirs', [\App\Http\Controllers\Api\CourseMaterialController::class, 'storeHomework']);
+        Route::put('/devoirs/{id}', [\App\Http\Controllers\Api\CourseMaterialController::class, 'updateHomework']);
+        Route::delete('/devoirs/{id}', [\App\Http\Controllers\Api\CourseMaterialController::class, 'destroyHomework']);
     });
 
     // Chatbot (Common to Eleve, Parent, etc.)
     Route::middleware('role:eleve,parent,enseignant,admin')->prefix('chatbot')->group(function () {
-        Route::post('/message', function () {
-            return response()->json(['message' => 'Chatbot message placeholder.']);
-        });
+        Route::post('/message', [\App\Http\Controllers\Api\ChatbotController::class, 'message']);
+        Route::get('/history', [\App\Http\Controllers\Api\ChatbotController::class, 'history']);
+    });
+
+    // ── Transport Management (admin only) ──────────────────────────────
+    Route::middleware('role:admin')->prefix('transport')->group(function () {
+        Route::get('/vehicules', [\App\Http\Controllers\Api\TransportController::class, 'indexVehicles']);
+        Route::post('/vehicules', [\App\Http\Controllers\Api\TransportController::class, 'storeVehicle']);
+        Route::get('/vehicules/{id}', [\App\Http\Controllers\Api\TransportController::class, 'showVehicle']);
+        Route::put('/vehicules/{id}', [\App\Http\Controllers\Api\TransportController::class, 'updateVehicle']);
+        Route::delete('/vehicules/{id}', [\App\Http\Controllers\Api\TransportController::class, 'destroyVehicle']);
+
+        Route::get('/chauffeurs', [\App\Http\Controllers\Api\TransportController::class, 'indexDrivers']);
+        Route::get('/chauffeurs/available', [\App\Http\Controllers\Api\TransportController::class, 'availableDrivers']);
+        Route::post('/chauffeurs', [\App\Http\Controllers\Api\TransportController::class, 'storeDriver']);
+        Route::get('/chauffeurs/{id}', [\App\Http\Controllers\Api\TransportController::class, 'showDriver']);
+        Route::put('/chauffeurs/{id}', [\App\Http\Controllers\Api\TransportController::class, 'updateDriver']);
+        Route::delete('/chauffeurs/{id}', [\App\Http\Controllers\Api\TransportController::class, 'destroyDriver']);
+
+        Route::get('/itineraires', [\App\Http\Controllers\Api\TransportController::class, 'indexRoutes']);
+        Route::post('/itineraires', [\App\Http\Controllers\Api\TransportController::class, 'storeRoute']);
+        Route::get('/itineraires/{id}', [\App\Http\Controllers\Api\TransportController::class, 'showRoute']);
+        Route::put('/itineraires/{id}', [\App\Http\Controllers\Api\TransportController::class, 'updateRoute']);
+        Route::delete('/itineraires/{id}', [\App\Http\Controllers\Api\TransportController::class, 'destroyRoute']);
+
+        Route::post('/itineraires/{id}/assign', [\App\Http\Controllers\Api\TransportController::class, 'assignStudents']);
+        Route::delete('/itineraires/{routeId}/students/{studentId}', [\App\Http\Controllers\Api\TransportController::class, 'removeStudent']);
+    });
+
+    // ── Driver Dashboard & Live Tracking (chauffeur and admin) ──────────
+    Route::middleware('role:chauffeur,admin')->prefix('transport')->group(function () {
+        Route::get('/driver-route', [\App\Http\Controllers\Api\TransportController::class, 'driverRoute']);
+        Route::get('/students/{studentId}/route', [\App\Http\Controllers\Api\TransportController::class, 'getStudentRoute']);
+        Route::post('/students/{studentId}/route', [\App\Http\Controllers\Api\TransportController::class, 'saveStudentRoute']);
+    });
+
+    // ── Announcements ───────────────────────────────────────
+    Route::get('/annonces', [\App\Http\Controllers\Api\AnnouncementController::class, 'index']);  // filtered by role server-side
+    Route::get('/annonces/{id}', [\App\Http\Controllers\Api\AnnouncementController::class, 'show']);
+
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/annonces', [\App\Http\Controllers\Api\AnnouncementController::class, 'store']);
+        Route::put('/annonces/{id}', [\App\Http\Controllers\Api\AnnouncementController::class, 'update']);
+        Route::delete('/annonces/{id}', [\App\Http\Controllers\Api\AnnouncementController::class, 'destroy']);
+        Route::put('/annonces/{id}/pin', [\App\Http\Controllers\Api\AnnouncementController::class, 'togglePin']);
+    });
+
+    // ── Notifications ───────────────────────────────────────
+    Route::prefix('notifications')->group(function () {
+        Route::get('/me', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+        Route::get('/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+        Route::get('/latest', [\App\Http\Controllers\Api\NotificationController::class, 'latest']);
+        Route::put('/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markRead']);
+        Route::put('/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllRead']);
+    });
+
+    // ── Admin Statistics ────────────────────────────────────
+    Route::middleware('role:admin')->prefix('v1/admin/stats')->group(function () {
+        Route::get('overview', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'overview']);
+        Route::get('attendance', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'attendance']);
+        Route::get('grades', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'grades']);
+        Route::get('finance', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'finance']);
+        Route::get('upcoming-exams', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'upcomingExams']);
+        Route::get('recent-activities', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'recentActivities']);
     });
 });
+

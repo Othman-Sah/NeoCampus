@@ -28,6 +28,7 @@ import {
 import { Book } from '@/domain/entities/Book'
 import { Loan } from '@/domain/entities/Loan'
 import { Member } from '@/domain/entities/Member'
+import EmptyState from '@/ui/components/EmptyState'
 import { 
   Plus, 
   Search, 
@@ -101,6 +102,7 @@ export const LoansManager: React.FC = () => {
   const [bookResults, setBookResults] = useState<Book[]>([])
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [searchingBooks, setSearchingBooks] = useState(false)
+  const [formErrors, setFormErrors] = useState<{ member?: string; book?: string }>({})
 
   // Debounced search for Member Selector
   useEffect(() => {
@@ -191,10 +193,19 @@ export const LoansManager: React.FC = () => {
 
   // Create Loan Action
   const handleSaveLoan = async () => {
-    if (!selectedMember || !selectedBook) {
-      triggerToast('error', 'Please select a member and a book.')
+    const errors: { member?: string; book?: string } = {}
+    if (!selectedMember) {
+      errors.member = 'Please select a library member.'
+    }
+    if (!selectedBook) {
+      errors.book = 'Please select a book to lend.'
+    }
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
       return
     }
+    setFormErrors({})
+
     try {
       await createLoan({ livreId: selectedBook.id, adherentId: selectedMember.id })
       triggerToast('success', t('toast_success_create_loan'))
@@ -351,16 +362,50 @@ export const LoansManager: React.FC = () => {
       {/* Loans Data Table Card */}
       <div className="bg-white rounded-[24px] border border-neutral-100 shadow-sm overflow-hidden p-6">
         {((activeTab === 'all' && loansLoading) || (activeTab === 'overdue' && overdueLoading)) ? (
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-neutral-100">
+                  <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('member_column')}</th>
+                  <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('book_column')}</th>
+                  <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('loan_date_column')}</th>
+                  <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('due_date_column')}</th>
+                  {activeTab === 'all' ? (
+                    <>
+                      <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('return_date_column')}</th>
+                      <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('status_column')}</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('overdue_days_column')}</th>
+                      <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider">{t('fine_column')}</th>
+                    </>
+                  )}
+                  <th className="text-[9px] font-black text-neutral-400 uppercase pb-4 tracking-wider text-right">{t('actions_column')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-50">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={idx}>
+                    <td className="py-4 pr-2"><Skeleton className="h-4 w-32" /></td>
+                    <td className="py-4 pr-2"><Skeleton className="h-4 w-40" /></td>
+                    <td className="py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="py-4"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                    <td className="py-4 text-right"><Skeleton className="h-8 w-24 rounded-lg ml-auto" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (activeTab === 'all' ? loans.length === 0 : overdueLoans.length === 0) ? (
-          <div className="text-center py-20 text-xs text-neutral-450 font-bold uppercase border-2 border-dashed border-neutral-50 rounded-2xl">
-            No loans found.
-          </div>
+          <EmptyState
+            title={activeTab === 'all' ? 'No Loans Found' : 'No Overdue Loans'}
+            description={activeTab === 'all' ? 'No library loans match your filter criteria.' : 'All library loans are currently in good standing.'}
+            actionText="Record a Loan"
+            onAction={() => setIsSheetOpen(true)}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -598,6 +643,7 @@ export const LoansManager: React.FC = () => {
                   )}
                 </div>
               )}
+              {formErrors.member && <p className="text-[10px] text-red-500 font-semibold mt-1">{formErrors.member}</p>}
             </div>
 
             {/* Book Search Selector */}
@@ -681,6 +727,7 @@ export const LoansManager: React.FC = () => {
                   </p>
                 </div>
               )}
+              {formErrors.book && <p className="text-[10px] text-red-500 font-semibold mt-1">{formErrors.book}</p>}
             </div>
 
             <div className="pt-6 border-t border-neutral-100 flex flex-row items-center justify-end gap-3 w-full mt-6">

@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useStudent } from '@/application/useCases/useStudent'
+import { useTransport } from '@/application/useCases/useTransport'
+import { StudentTransportMap } from '@/ui/components/StudentTransportMap'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -49,6 +51,14 @@ export const StudentCreatePage: React.FC = () => {
   const [step, setStep] = useState(1)
   const [errorMsg, setErrorMsg] = useState('')
   const { students, createStudent, creating, uploadAvatar } = useStudent()
+  const { saveStudentRoute } = useTransport()
+
+  // Transport states
+  const [transportRequired, setTransportRequired] = useState(false)
+  const [routeId, setRouteId] = useState<number | null>(null)
+  const [pointRamassage, setPointRamassage] = useState('Home Pickup')
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
 
   // Photo state
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -191,6 +201,23 @@ export const StudentCreatePage: React.FC = () => {
           read: false
         });
         localStorage.setItem('neocampus_finance_alerts', JSON.stringify(alerts));
+      }
+
+      // Save transport assignment if required
+      if (newStudent?.id && transportRequired) {
+        try {
+          await saveStudentRoute({
+            studentId: newStudent.id,
+            data: {
+              itineraire_id: routeId,
+              point_ramassage: pointRamassage,
+              latitude,
+              longitude
+            }
+          })
+        } catch (transportErr) {
+          console.warn('Transport assignment failed, but student was created:', transportErr)
+        }
       }
 
       // Upload avatar if a photo was selected
@@ -413,7 +440,7 @@ export const StudentCreatePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="adresse" className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                  <Label htmlFor="adresse" className="text-[10px] font-bold text-neutral-450 uppercase tracking-wider">
                     Home Address
                   </Label>
                   <Input 
@@ -421,6 +448,23 @@ export const StudentCreatePage: React.FC = () => {
                     {...register('adresse')} 
                     placeholder="e.g. 123 Rue de l'Ecole, Casablanca"
                     className="bg-white border-[#e5e7eb] text-neutral-900 rounded-lg text-xs h-9 focus-visible:ring-1 focus-visible:ring-black" 
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <StudentTransportMap
+                    transportRequired={transportRequired}
+                    onChangeTransportRequired={setTransportRequired}
+                    routeId={routeId}
+                    onChangeRouteId={setRouteId}
+                    pointRamassage={pointRamassage}
+                    onChangePointRamassage={setPointRamassage}
+                    latitude={latitude}
+                    longitude={longitude}
+                    onChangeCoordinates={(lat, lng) => {
+                      setLatitude(lat);
+                      setLongitude(lng);
+                    }}
                   />
                 </div>
 

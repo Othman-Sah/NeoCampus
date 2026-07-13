@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/application/stores/authStore'
 import { useTranslation } from '@/application/useCases/useTranslation'
 import { TranslationKey } from '@/application/utils/translations'
@@ -27,6 +28,8 @@ import {
   Banknote
 } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { NotificationBell } from '@/ui/components/NotificationBell'
+import { ChatbotWidget } from '@/ui/components/ChatbotWidget'
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -53,9 +56,10 @@ interface NavCategory {
 }
 
 // Helper to generate role-specific navigation list using keys
-const getNavItemsForRole = (role: UserRole): NavCategory[] => {
+const getNavItemsForRole = (role: UserRole, selectedChildId: string | null): NavCategory[] => {
   switch (role) {
     case 'parent':
+      const childPrefix = selectedChildId ? `/parent/child/${selectedChildId}` : '/parent';
       return [
         {
           id: 'pedagogy',
@@ -64,16 +68,15 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           hasSubmenu: true,
           gridCols: 'grid-cols-2',
           items: [
-            { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
-            { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
-            { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
-            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
+            { nameKey: 'submenu_grades', path: `${childPrefix}/grades`, icon: GraduationCap },
+            { nameKey: 'submenu_absence', path: `${childPrefix}/attendance`, icon: FileSpreadsheet },
+            { nameKey: 'submenu_library', path: `${childPrefix}/library`, icon: BookOpen },
+            { nameKey: 'submenu_bulletins', path: `${childPrefix}/bulletins`, icon: FileText },
           ]
         },
-        { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
-        { id: 'analytics', nameKey: 'analytics', icon: BarChart3, hasSubmenu: false, path: '/finance' },
+        { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: `${childPrefix}/timetable` },
+        { id: 'analytics', nameKey: 'analytics', icon: BarChart3, hasSubmenu: false, path: `${childPrefix}/balance` },
         { id: 'communication', nameKey: 'communication', icon: MessageSquare, hasSubmenu: false, path: '/chatbot' },
-        { id: 'transport', nameKey: 'transport', icon: Bus, hasSubmenu: false, path: '/transport' },
       ];
     case 'eleve':
       return [
@@ -84,37 +87,28 @@ const getNavItemsForRole = (role: UserRole): NavCategory[] => {
           hasSubmenu: true,
           gridCols: 'grid-cols-2',
           items: [
-            { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
-            { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
-            { nameKey: 'submenu_library', path: '/library', icon: BookOpen },
+            { nameKey: 'submenu_grades', path: '/student/grades', icon: GraduationCap },
+            { nameKey: 'submenu_absence', path: '/student/attendance', icon: FileSpreadsheet },
+            { nameKey: 'submenu_library', path: '/student/library', icon: BookOpen },
             { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
           ]
         },
-        { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
-        { id: 'analytics', nameKey: 'analytics', icon: BarChart3, hasSubmenu: false, path: '/finance' },
+        { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/student/timetable' },
+        { id: 'homework', nameKey: 'submenu_homework' as any, icon: BookOpen, hasSubmenu: false, path: '/student/homework' },
+        { id: 'supports', nameKey: 'submenu_supports' as any, icon: FileText, hasSubmenu: false, path: '/student/supports' },
         { id: 'communication', nameKey: 'communication', icon: MessageSquare, hasSubmenu: false, path: '/chatbot' },
-        { id: 'transport', nameKey: 'transport', icon: Bus, hasSubmenu: false, path: '/transport' },
       ];
     case 'enseignant':
       return [
-        {
-          id: 'pedagogy',
-          nameKey: 'pedagogy',
-          icon: BookOpen,
-          hasSubmenu: true,
-          gridCols: 'grid-cols-3',
-          items: [
-            { nameKey: 'submenu_classes', path: '/admin/classes', icon: BookMarked },
-            { nameKey: 'submenu_timetable', path: '/timetable', icon: CalendarDays },
-            { nameKey: 'submenu_exams', path: '/teacher/exams', icon: FileText },
-            { nameKey: 'submenu_grades', path: '/grades', icon: GraduationCap },
-            { nameKey: 'submenu_absence', path: '/attendance', icon: FileSpreadsheet },
-            { nameKey: 'submenu_salaries', path: '/teacher/salaires', icon: FileText },
-            { nameKey: 'submenu_bulletins', path: '/bulletins', icon: FileText },
-          ]
-        },
+        { id: 'classes', nameKey: 'submenu_classes', icon: BookMarked, hasSubmenu: false, path: '/admin/classes' },
         { id: 'calendar', nameKey: 'calendar', icon: Calendar, hasSubmenu: false, path: '/timetable' },
-        { id: 'communication', nameKey: 'announce', icon: PenTool, hasSubmenu: false, path: '/announcements' },
+        { id: 'exams', nameKey: 'submenu_exams', icon: FileText, hasSubmenu: false, path: '/teacher/exams' },
+        { id: 'grades', nameKey: 'submenu_grades', icon: GraduationCap, hasSubmenu: false, path: '/grades' },
+        { id: 'attendance', nameKey: 'submenu_absence', icon: FileSpreadsheet, hasSubmenu: false, path: '/attendance' },
+        { id: 'bulletins', nameKey: 'submenu_bulletins', icon: FileText, hasSubmenu: false, path: '/bulletins' },
+        { id: 'homework', nameKey: 'submenu_homework' as any, icon: BookOpen, hasSubmenu: false, path: '/teacher/homework' },
+        { id: 'salaries', nameKey: 'submenu_salaries', icon: Coins, hasSubmenu: false, path: '/teacher/salaires' },
+        { id: 'communication', nameKey: 'communication', icon: MessageSquare, hasSubmenu: false, path: '/chatbot' },
       ];
     case 'admin':
       return [
@@ -203,6 +197,16 @@ export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(localStorage.getItem('selected_child_id'))
+
+  useEffect(() => {
+    const handleChildChanged = () => {
+      setSelectedChildId(localStorage.getItem('selected_child_id'))
+    }
+    window.addEventListener('childChanged', handleChildChanged)
+    return () => window.removeEventListener('childChanged', handleChildChanged)
+  }, [])
+
   if (!user) return null
 
   const handleLogout = () => {
@@ -211,7 +215,7 @@ export const DashboardLayout: React.FC = () => {
   }
 
   // Get items list for current user role
-  const roleNavItems = getNavItemsForRole(user.role)
+  const roleNavItems = getNavItemsForRole(user.role, selectedChildId)
 
   // Find if category or subitem is active
   const isCategoryActive = (category: NavCategory) => {
@@ -371,10 +375,7 @@ export const DashboardLayout: React.FC = () => {
             </DropdownMenu>
 
             {/* Notification Bell */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-lg relative text-neutral-500 hover:bg-neutral-50 hover:text-black transition focus:outline-none cursor-pointer">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
-            </button>
+            <NotificationBell />
 
             <div className="h-5 w-px bg-neutral-200" />
 
@@ -441,10 +442,22 @@ export const DashboardLayout: React.FC = () => {
 
           {/* Render Route Pages */}
           <div className="h-full">
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="h-full"
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>
+      <ChatbotWidget />
     </div>
   )
 }

@@ -1,7 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useStudent } from '@/application/useCases/useStudent'
+import { useOverviewStats } from '@/application/useCases/admin/useStatistics'
 import { 
   GraduationCap, 
   BookOpen, 
@@ -14,7 +16,7 @@ import {
 
 interface UserRoleCardProps {
   title: string;
-  count: number;
+  count: React.ReactNode;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   link: string;
@@ -35,9 +37,9 @@ const UserRoleCard: React.FC<UserRoleCardProps> = ({
             <div className="p-3 rounded-xl bg-[#f9f9f9] border border-[#e5e7eb] text-black">
               <Icon className="h-5 w-5 text-black group-hover:scale-105 transition-transform duration-200" />
             </div>
-            <span className="text-2xl font-black text-neutral-900 tracking-tight leading-none">
+            <div className="text-2xl font-black text-neutral-900 tracking-tight leading-none">
               {count}
-            </span>
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -61,46 +63,64 @@ const UserRoleCard: React.FC<UserRoleCardProps> = ({
 
 export const UserHubPage: React.FC = () => {
   const { students } = useStudent()
+  const { data: overview, isLoading } = useOverviewStats()
+
+  const renderCount = (key: keyof typeof overview | 'students') => {
+    if (isLoading) {
+      return <Skeleton className="h-6 w-10 rounded animate-pulse" />
+    }
+    if (!overview) {
+      if (key === 'students') return students.length;
+      return 0;
+    }
+    if (key === 'students') return overview.total_eleves;
+    if (key === 'teachers') return overview.total_enseignants;
+    if (key === 'parents') return overview.total_parents ?? 0;
+    if (key === 'accountants') return overview.total_comptables ?? 0;
+    if (key === 'librarians') return overview.total_bibliothecaires ?? 0;
+    if (key === 'admins') return overview.total_admins ?? 0;
+    return 0;
+  }
 
   const userRoles = [
     {
       title: 'Students',
-      count: students.length,
+      count: renderCount('students'),
       description: 'Manage student profiles, enrollments, class structures and academic folders',
       icon: GraduationCap,
       link: '/admin/students',
     },
     {
       title: 'Teachers',
-      count: 42,
+      count: renderCount('teachers'),
       description: 'Manage faculty specialties, course workloads and class schedules',
       icon: BookOpen,
       link: '/admin/teachers',
     },
     {
       title: 'Parents',
-      count: 512,
+      count: renderCount('parents'),
       description: 'Manage guardian contacts, link siblings and parent communication details',
       icon: Users,
       link: '/admin/parents',
     },
     {
       title: 'Accountants',
-      count: 3,
+      count: renderCount('accountants'),
       description: 'Manage finance managers, cash collections and accounting reports',
       icon: CreditCard,
       link: '/admin/accountants',
     },
     {
       title: 'Librarians',
-      count: 2,
+      count: renderCount('librarians'),
       description: 'Manage librarians, physical catalog issues, and overdue lists',
       icon: BookMarked,
       link: '/library',
     },
     {
       title: 'Administrators',
-      count: 4,
+      count: renderCount('admins'),
       description: 'Supervise general system settings, tenants profiles and site administrators',
       icon: ShieldAlert,
       link: '/admin/settings',

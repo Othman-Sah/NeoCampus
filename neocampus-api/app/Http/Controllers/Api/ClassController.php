@@ -245,6 +245,7 @@ class ClassController extends Controller
                 'matiere_id' => $matiere->id,
                 'matiere_nom' => $matiere->nom,
                 'enseignant_id' => $charge?->enseignant_id,
+                'enseignant_user_id' => $charge?->enseignant?->user_id,
                 'enseignant_nom' => $charge && $charge->enseignant && $charge->enseignant->user
                     ? ($charge->enseignant->user->prenom . ' ' . $charge->enseignant->user->nom)
                     : null,

@@ -23,6 +23,9 @@ export const translations = {
     submenu_timetable: 'Schedule',
     submenu_exams: 'Exams',
     submenu_finance: 'Finance',
+    submenu_homework: 'Devoirs',
+    submenu_supports: 'Supports',
+
 
     // Login Card
     login_title: 'Login',
@@ -235,7 +238,17 @@ export const translations = {
     parent_signature: "Signature des Parents",
     director_signature: "Signature du Directeur",
     dispense_badge: "Dispense",
-    absent_badge: "Absence Justifiée"
+    absent_badge: "Absence Justifiée",
+    admin_dashboard_title: "Tableau de Bord Super Admin",
+    admin_dashboard_subtitle: "Statistiques globales, présences, finances et flux d'activités.",
+    total_teachers: "Total Enseignants",
+    daily_attendance: "Présence d'Aujourd'hui",
+    monthly_revenue: "Taux de Recouvrement Mensuel",
+    attendance_trend: "Taux de Présence (30 derniers jours)",
+    finance_overview: "Recouvrement vs Impayés (6 derniers mois)",
+    grade_distribution: "Moyennes et Extrêmes des Notes par Matière",
+    upcoming_exams: "Examens à Venir",
+    recent_activities: "Logs Système & Flux d'Activité"
   },
   en: {
     // Navigation / Categories
@@ -259,6 +272,9 @@ export const translations = {
     submenu_timetable: 'Agenda',
     submenu_exams: 'Exams',
     submenu_finance: 'Finance',
+    submenu_homework: 'Homework',
+    submenu_supports: 'Materials',
+
 
     // Login Card
     login_title: 'Login',
@@ -471,7 +487,17 @@ export const translations = {
     parent_signature: "Parent Signature",
     director_signature: "Principal Signature",
     dispense_badge: "Exempt",
-    absent_badge: "Excused"
+    absent_badge: "Excused",
+    admin_dashboard_title: "Super Admin Dashboard",
+    admin_dashboard_subtitle: "General school statistics, attendance logs, finance trends and activity feeds.",
+    total_teachers: "Total Teachers",
+    daily_attendance: "Today's Attendance",
+    monthly_revenue: "Monthly Collection Rate",
+    attendance_trend: "Attendance Rate (Last 30 Days)",
+    finance_overview: "Collections vs Outstanding (Last 6 Months)",
+    grade_distribution: "Grade Averages & Extremes by Subject",
+    upcoming_exams: "Upcoming Exams",
+    recent_activities: "System Logs & Feed"
   }
 };
 

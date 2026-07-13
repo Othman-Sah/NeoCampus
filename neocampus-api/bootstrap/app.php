@@ -46,4 +46,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 'code' => 'MAX_LOANS_EXCEEDED'
             ], 422);
         });
+
+        $exceptions->render(function (\App\Domain\Exceptions\ChatbotRateLimitException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => new \stdClass(),
+                'code' => 'CHATBOT_RATE_LIMIT_EXCEEDED'
+            ], 429);
+        });
     })->create();

@@ -13,6 +13,8 @@ import {
   DialogFooter 
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import EmptyState from '@/ui/components/EmptyState'
 import { 
   Search, 
   UserPlus, 
@@ -169,9 +171,26 @@ export const TeachersPage: React.FC = () => {
 
       {/* Card Grid of Teachers */}
       {loadingTeachers ? (
-        <div className="flex items-center justify-center py-20 text-xs font-bold uppercase tracking-wider text-neutral-400 gap-2">
-          <Loader2 className="animate-spin h-5 w-5 text-black" />
-          Loading Teachers...
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx} className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm p-5 space-y-4">
+              <div className="flex items-start gap-4">
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              </div>
+              <div className="space-y-2 border-t border-neutral-50 pt-3">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-50">
+                <Skeleton className="h-8 w-20 rounded-lg" />
+                <Skeleton className="h-8 w-16 rounded-lg" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : paginatedTeachers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -269,11 +288,12 @@ export const TeachersPage: React.FC = () => {
           })}
         </div>
       ) : (
-        <Card className="bg-white border border-[#E5E7EB] rounded-2xl p-12 text-center">
-          <GraduationCap className="h-12 w-12 text-neutral-350 mx-auto mb-4 animate-bounce" />
-          <h3 className="text-sm font-black uppercase text-neutral-850 tracking-wider">No Teachers Found</h3>
-          <p className="text-xs text-neutral-400 mt-1">Try resetting your search parameters or register a new teacher profile</p>
-        </Card>
+        <EmptyState
+          title="No Teachers Found"
+          description="Try resetting your search parameters or register a new teacher profile."
+          actionText="Add New Teacher"
+          onAction={() => navigate('/admin/teachers/create')}
+        />
       )}
 
       {/* Pagination footer */}

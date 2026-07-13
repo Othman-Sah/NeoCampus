@@ -162,6 +162,10 @@ class BulletinFeatureTest extends TestCase
             'classe_id' => $this->classA->id,
         ]);
 
+        $this->classA->matieres()->attach($this->math->id, ['etablissement_id' => $this->etablissementA->id]);
+        $this->classA->matieres()->attach($this->french->id, ['etablissement_id' => $this->etablissementA->id]);
+
+
         // Create Students
         $this->student1User = User::create([
             'etablissement_id' => $this->etablissementA->id,

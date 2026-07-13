@@ -6,6 +6,7 @@ import ProtectedRoute from '@/ui/components/ProtectedRoute'
 import LoginPage from '@/ui/pages/login/LoginPage'
 import PlaceholderPage from '@/ui/pages/PlaceholderPage'
 import DashboardPage from '@/ui/pages/dashboard/DashboardPage'
+import AdminDashboardPage from '@/ui/pages/admin/AdminDashboardPage'
 import UserHubPage from '@/ui/pages/users/UserHubPage'
 import StudentDirectoryPage from '@/ui/pages/students/StudentDirectoryPage'
 import StudentCreatePage from '@/ui/pages/students/StudentCreatePage'
@@ -24,6 +25,7 @@ import StudentPaymentView from '@/ui/pages/finance/StudentPaymentView'
 import ReportsPage from '@/ui/pages/finance/ReportsPage'
 import PayoutsPage from '@/ui/pages/finance/PayoutsPage'
 import AccountantDirectoryPage from '@/ui/pages/users/AccountantDirectoryPage'
+import { ParentsDirectoryPage } from '@/ui/pages/users/ParentsDirectoryPage'
 import { TimetablePage } from '@/ui/pages/timetable/TimetablePage'
 import { AttendanceSheetPage } from '@/ui/pages/attendance/AttendanceSheetPage'
 import { GradeEntrySheetPage } from '@/ui/pages/grades/GradeEntrySheetPage'
@@ -43,6 +45,30 @@ import AdminDashboard from '@/ui/pages/bulletins/AdminDashboard'
 import AppreciationEditor from '@/ui/pages/bulletins/AppreciationEditor'
 import BulletinPrintView from '@/ui/pages/bulletins/BulletinPrintView'
 import BulletinSettingsPage from '@/ui/pages/bulletins/BulletinSettingsPage'
+import TransportPage from '@/ui/pages/transport/TransportPage'
+import { FullscreenTrackingPage } from '@/ui/pages/transport/FullscreenTrackingPage'
+import DriverDashboardPage from '@/ui/pages/driver/DriverDashboardPage'
+import AnnouncementFeedPage from '@/ui/pages/announcements/AnnouncementFeedPage'
+
+// Parent Portal Pages
+import ParentChildGradesPage from '@/ui/pages/parent/ParentChildGradesPage'
+import ParentChildAttendancePage from '@/ui/pages/parent/ParentChildAttendancePage'
+import ParentChildTimetablePage from '@/ui/pages/parent/ParentChildTimetablePage'
+import ParentChildBalancePage from '@/ui/pages/parent/ParentChildBalancePage'
+import ParentChildBulletinsPage from '@/ui/pages/parent/ParentChildBulletinsPage'
+import ParentChildLibraryPage from '@/ui/pages/parent/ParentChildLibraryPage'
+
+// Student Portal Pages
+import StudentGradesPage from '@/ui/pages/student/StudentGradesPage'
+import StudentAttendancePage from '@/ui/pages/student/StudentAttendancePage'
+import StudentTimetablePage from '@/ui/pages/student/StudentTimetablePage'
+import StudentSupportsPage from '@/ui/pages/student/StudentSupportsPage'
+import StudentHomeworkPage from '@/ui/pages/student/StudentHomeworkPage'
+import StudentLibraryPage from '@/ui/pages/student/StudentLibraryPage'
+
+// Teacher Portal Pages
+import { TeacherHomeworkPage } from '@/ui/pages/teacher/TeacherHomeworkPage'
+
 
 export const App: React.FC = () => {
   return (
@@ -60,17 +86,25 @@ export const App: React.FC = () => {
             <Route path="/timetable" element={<TimetablePage />} />
             <Route path="/attendance" element={<AttendanceDashboardPage />} />
             <Route path="/grades" element={<GradesDashboardPage />} />
-            <Route path="/announcements" element={<PlaceholderPage />} />
+            <Route path="/announcements" element={<AnnouncementFeedPage />} />
             <Route path="/bulletins" element={<AdminDashboard />} />
             <Route path="/bulletins/:id" element={<BulletinPrintView />} />
             <Route path="/bulletins/:id/appreciations" element={<AppreciationEditor />} />
-            <Route path="/transport" element={<PlaceholderPage />} />
+          </Route>
+        </Route>
+
+        {/* Transport & Driver-only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'chauffeur']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/transport" element={<TransportPage />} />
+            <Route path="/driver/dashboard" element={<DriverDashboardPage />} />
           </Route>
         </Route>
 
         {/* Admin-only Routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route element={<DashboardLayout />}>
+             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
              <Route path="/admin/users" element={<UserHubPage />} />
              <Route path="/admin/students" element={<StudentDirectoryPage />} />
              <Route path="/admin/students/create" element={<StudentCreatePage />} />
@@ -81,11 +115,13 @@ export const App: React.FC = () => {
              <Route path="/admin/teachers/create" element={<TeacherCreatePage />} />
              <Route path="/admin/teachers/:id/edit" element={<TeacherEditPage />} />
              <Route path="/admin/accountants" element={<AccountantDirectoryPage />} />
+             <Route path="/admin/parents" element={<ParentsDirectoryPage />} />
              <Route path="/admin/classes" element={<ClassesPage />} />
              <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
              <Route path="/admin/exams" element={<AdminExamManagementPage />} />
              <Route path="/bulletins/settings" element={<BulletinSettingsPage />} />
           </Route>
+          <Route path="/admin/transport/tracking" element={<FullscreenTrackingPage />} />
         </Route>
 
         {/* Finance-only Routes */}
@@ -108,6 +144,7 @@ export const App: React.FC = () => {
             <Route path="/teacher/grades/:examenId" element={<GradeEntrySheetPage />} />
             <Route path="/teacher/exams/upload/:id" element={<ExamUploadWizardPage />} />
             <Route path="/teacher/exams" element={<TeacherExamManagementPage />} />
+            <Route path="/teacher/homework" element={<TeacherHomeworkPage />} />
           </Route>
         </Route>
 
@@ -124,6 +161,31 @@ export const App: React.FC = () => {
             <Route path="/library/settings" element={<LibrarySettings />} />
           </Route>
         </Route>
+
+        {/* Parent-only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['parent']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/parent/child/:childId/grades" element={<ParentChildGradesPage />} />
+            <Route path="/parent/child/:childId/attendance" element={<ParentChildAttendancePage />} />
+            <Route path="/parent/child/:childId/timetable" element={<ParentChildTimetablePage />} />
+            <Route path="/parent/child/:childId/balance" element={<ParentChildBalancePage />} />
+            <Route path="/parent/child/:childId/bulletins" element={<ParentChildBulletinsPage />} />
+            <Route path="/parent/child/:childId/library" element={<ParentChildLibraryPage />} />
+          </Route>
+        </Route>
+
+        {/* Student-only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['eleve']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/student/grades" element={<StudentGradesPage />} />
+            <Route path="/student/attendance" element={<StudentAttendancePage />} />
+            <Route path="/student/timetable" element={<StudentTimetablePage />} />
+            <Route path="/student/supports" element={<StudentSupportsPage />} />
+            <Route path="/student/homework" element={<StudentHomeworkPage />} />
+            <Route path="/student/library" element={<StudentLibraryPage />} />
+          </Route>
+        </Route>
+
 
 
 

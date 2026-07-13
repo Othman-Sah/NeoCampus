@@ -66,4 +66,30 @@ class Eleve extends Model
     {
         return $this->belongsTo(Classe::class, 'classe_id');
     }
+
+    /**
+     * Get the parents linked to this student.
+     */
+    public function parents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'parent_eleve', 'eleve_id', 'parent_user_id')
+            ->withPivot('relation')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the homework assigned to this student's class.
+     */
+    public function devoirs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Devoir::class, 'classe_id', 'classe_id');
+    }
+
+    /**
+     * Get the course supports shared with this student's class.
+     */
+    public function supports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Support::class, 'classe_id', 'classe_id');
+    }
 }

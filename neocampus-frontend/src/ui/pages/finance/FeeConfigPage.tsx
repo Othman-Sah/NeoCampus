@@ -57,6 +57,11 @@ export const FeeConfigPage: React.FC = () => {
   const [dueDate, setDueDate] = useState('');
   const [academicYear, setAcademicYear] = useState('2025-2026');
 
+  // Validation Error States
+  const [groupErrors, setGroupErrors] = useState<{ nom?: string }>({});
+  const [typeErrors, setTypeErrors] = useState<{ libelle?: string; groupe_frais_id?: string; montant_par_defaut?: string }>({});
+  const [assignErrors, setAssignErrors] = useState<{ type_frais_ids?: string; target?: string; date_echeance?: string }>({});
+
   // Status/Messages
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -68,6 +73,11 @@ export const FeeConfigPage: React.FC = () => {
   // Group Handlers
   const handleGroupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!groupNom.trim()) {
+      setGroupErrors({ nom: 'Category name is required.' });
+      return;
+    }
+    setGroupErrors({});
     try {
       if (editingGroupId) {
         await updateGroup({ id: editingGroupId, data: { nom: groupNom, description: groupDesc } });
@@ -106,11 +116,28 @@ export const FeeConfigPage: React.FC = () => {
   // Type Handlers
   const handleTypeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const errors: typeof typeErrors = {};
+    if (!typeLibelle.trim()) {
+      errors.libelle = 'Fee rate label is required.';
+    }
+    if (!typeGroupId) {
+      errors.groupe_frais_id = 'Associated category is required.';
+    }
+    const val = parseFloat(typeMontant);
+    if (isNaN(val) || val <= 0) {
+      errors.montant_par_defaut = 'Amount must be a positive number.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setTypeErrors(errors);
+      return;
+    }
+    setTypeErrors({});
     try {
       const data = {
         libelle: typeLibelle,
         groupe_frais_id: parseInt(typeGroupId),
-        montant_par_defaut: parseFloat(typeMontant)
+        montant_par_defaut: val
       };
 
       if (editingTypeId) {
@@ -152,22 +179,25 @@ export const FeeConfigPage: React.FC = () => {
   // Assign Fee Handler
   const handleAssignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const errors: typeof assignErrors = {};
     if (selectedTypeIds.length === 0) {
-      showStatus('Please select at least one fee type.', 'error');
-      return;
+      errors.type_frais_ids = 'Please select at least one fee rate.';
     }
     if (assignTarget === 'student' && !selectedStudentId) {
-      showStatus('Please select a student.', 'error');
-      return;
+      errors.target = 'Please select a student.';
     }
     if (assignTarget === 'class' && !selectedClassId) {
-      showStatus('Please select a class.', 'error');
-      return;
+      errors.target = 'Please select a class.';
     }
     if (!dueDate) {
-      showStatus('Please define a due date.', 'error');
+      errors.date_echeance = 'Please define a due date.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setAssignErrors(errors);
       return;
     }
+    setAssignErrors({});
 
     try {
       await assignFees({
@@ -417,6 +447,7 @@ export const FeeConfigPage: React.FC = () => {
                   onChange={e => setGroupNom(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all text-sm"
                 />
+                {groupErrors.nom && <p className="text-[10px] text-red-500 font-semibold mt-1">{groupErrors.nom}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
@@ -475,6 +506,7 @@ export const FeeConfigPage: React.FC = () => {
                   onChange={e => setTypeLibelle(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all text-sm"
                 />
+                {typeErrors.libelle && <p className="text-[10px] text-red-500 font-semibold mt-1">{typeErrors.libelle}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
@@ -491,6 +523,7 @@ export const FeeConfigPage: React.FC = () => {
                     <option key={g.id} value={g.id}>{g.nom}</option>
                   ))}
                 </select>
+                {typeErrors.groupe_frais_id && <p className="text-[10px] text-red-500 font-semibold mt-1">{typeErrors.groupe_frais_id}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
@@ -508,6 +541,7 @@ export const FeeConfigPage: React.FC = () => {
                   />
                   <DollarSign className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                 </div>
+                {typeErrors.montant_par_defaut && <p className="text-[10px] text-red-500 font-semibold mt-1">{typeErrors.montant_par_defaut}</p>}
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button
@@ -560,6 +594,7 @@ export const FeeConfigPage: React.FC = () => {
                     </label>
                   ))}
                 </div>
+                {assignErrors.type_frais_ids && <p className="text-[10px] text-red-500 font-semibold mt-1">{assignErrors.type_frais_ids}</p>}
               </div>
 
               {/* Targets */}
@@ -619,6 +654,7 @@ export const FeeConfigPage: React.FC = () => {
                   </select>
                 </div>
               )}
+              {assignErrors.target && <p className="text-[10px] text-red-500 font-semibold mt-1">{assignErrors.target}</p>}
 
               {/* Academic Year and Due date */}
               <div className="grid grid-cols-2 gap-4">
@@ -644,6 +680,7 @@ export const FeeConfigPage: React.FC = () => {
                     onChange={e => setDueDate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all text-sm"
                   />
+                  {assignErrors.date_echeance && <p className="text-[10px] text-red-500 font-semibold mt-1">{assignErrors.date_echeance}</p>}
                 </div>
               </div>
 

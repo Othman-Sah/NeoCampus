@@ -17,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AuthPortInterface::class, EloquentAuthRepository::class);
         $this->app->bind(StudentPortInterface::class, EloquentStudentRepository::class);
+        $this->app->bind(\App\Domain\Ports\StatisticsRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentStatisticsRepository::class);
         $this->app->bind(\App\Domain\Ports\ClassPortInterface::class, \App\Infrastructure\Persistence\EloquentClassRepository::class);
         $this->app->bind(\App\Domain\Ports\TeacherPortInterface::class, \App\Infrastructure\Persistence\EloquentTeacherRepository::class);
         $this->app->bind(\App\Domain\Ports\SalaryPortInterface::class, \App\Infrastructure\Persistence\EloquentSalaryRepository::class);
@@ -37,6 +38,19 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Domain\Ports\BookRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentBookRepository::class);
         $this->app->bind(\App\Domain\Ports\LoanRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentLoanRepository::class);
         $this->app->bind(\App\Domain\Ports\MemberRepositoryInterface::class, \App\Infrastructure\Persistence\EloquentMemberRepository::class);
+
+        // Transport, Announcements & Notifications Bindings
+        $this->app->bind(\App\Domain\Ports\TransportPortInterface::class, \App\Infrastructure\Persistence\EloquentTransportRepository::class);
+        $this->app->bind(\App\Domain\Ports\AnnouncementPortInterface::class, \App\Infrastructure\Persistence\EloquentAnnouncementRepository::class);
+        $this->app->bind(\App\Domain\Ports\NotificationPortInterface::class, \App\Infrastructure\Persistence\EloquentNotificationRepository::class);
+
+        // Parent, Student and Course Material Portals
+        $this->app->bind(\App\Domain\Ports\ParentPortalPortInterface::class, \App\Infrastructure\Persistence\EloquentParentPortalRepository::class);
+        $this->app->bind(\App\Domain\Ports\StudentPortalPortInterface::class, \App\Infrastructure\Persistence\EloquentStudentPortalRepository::class);
+        $this->app->bind(\App\Domain\Ports\CourseMaterialPortInterface::class, \App\Infrastructure\Persistence\EloquentCourseMaterialRepository::class);
+
+        // Chatbot Binding
+        $this->app->bind(\App\Domain\Ports\ChatbotPortInterface::class, \App\Infrastructure\External\LLMAdapter::class);
     }
 
     /**

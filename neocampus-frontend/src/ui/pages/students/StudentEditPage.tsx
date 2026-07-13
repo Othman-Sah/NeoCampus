@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useStudent } from '@/application/useCases/useStudent'
+import { useTransport } from '@/application/useCases/useTransport'
+import { StudentTransportMap } from '@/ui/components/StudentTransportMap'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -63,6 +65,34 @@ export const StudentEditPage: React.FC = () => {
 
   const { students, useStudentDetails, updateStudent, updating, uploadAvatar, revealPassword, updatePassword } = useStudent()
   const { data: student, isLoading: loadingStudent } = useStudentDetails(studentId)
+
+  const { useStudentRoute, saveStudentRoute } = useTransport()
+  const { data: studentRouteResponse } = useStudentRoute(studentId)
+  const studentRoute = studentRouteResponse?.data ?? null
+
+  // Transport states
+  const [transportRequired, setTransportRequired] = useState(false)
+  const [routeId, setRouteId] = useState<number | null>(null)
+  const [pointRamassage, setPointRamassage] = useState('Home Pickup')
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
+
+  // Initialize transport states from loaded route info
+  useEffect(() => {
+    if (studentRoute) {
+      setTransportRequired(true)
+      setRouteId(studentRoute.route_id || null)
+      setPointRamassage(studentRoute.point_ramassage || 'Home Pickup')
+      setLatitude(studentRoute.latitude || null)
+      setLongitude(studentRoute.longitude || null)
+    } else {
+      setTransportRequired(false)
+      setRouteId(null)
+      setPointRamassage('Home Pickup')
+      setLatitude(null)
+      setLongitude(null)
+    }
+  }, [studentRoute])
 
   // Photo state
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -284,6 +314,22 @@ export const StudentEditPage: React.FC = () => {
     try {
       setErrorMsg('')
       await updateStudent({ id: studentId, data: formattedData })
+
+      // Save/sync transport assignment
+      try {
+        await saveStudentRoute({
+          studentId,
+          data: {
+            itineraire_id: transportRequired ? routeId : null,
+            point_ramassage: transportRequired ? pointRamassage : null,
+            latitude: transportRequired ? latitude : null,
+            longitude: transportRequired ? longitude : null
+          }
+        })
+      } catch (transportErr) {
+        console.warn('Transport assignment failed, but student was updated:', transportErr)
+      }
+
       navigate('/admin/students')
     } catch (err: any) {
       console.error('Failed to update student:', err)
@@ -513,13 +559,30 @@ export const StudentEditPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="adresse" className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                  <Label htmlFor="adresse" className="text-[10px] font-bold text-neutral-450 uppercase tracking-wider">
                     Home Address
                   </Label>
                   <Input 
                     id="adresse" 
                     {...register('adresse')} 
                     className="bg-white border-[#e5e7eb] text-neutral-900 rounded-lg text-xs h-9 focus-visible:ring-1 focus-visible:ring-black" 
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <StudentTransportMap
+                    transportRequired={transportRequired}
+                    onChangeTransportRequired={setTransportRequired}
+                    routeId={routeId}
+                    onChangeRouteId={setRouteId}
+                    pointRamassage={pointRamassage}
+                    onChangePointRamassage={setPointRamassage}
+                    latitude={latitude}
+                    longitude={longitude}
+                    onChangeCoordinates={(lat, lng) => {
+                      setLatitude(lat);
+                      setLongitude(lng);
+                    }}
                   />
                 </div>
 

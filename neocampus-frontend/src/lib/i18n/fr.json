@@ -47,7 +47,7 @@
   "status_en_retard": "Overdue",
   "new_loan_btn": "Record a loan",
   "new_loan_desc": "Create a new book loan for a member.",
-  "select_member: "Select a member",
+  "select_member": "Select a member",
   "select_book": "Select a book",
   "member_search_placeholder": "Type a member name to search...",
   "book_search_placeholder": "Type a book title or ISBN to search...",
@@ -108,5 +108,17 @@
   "parent_signature": "Signature des Parents",
   "director_signature": "Signature du Directeur",
   "dispense_badge": "Dispense",
-  "absent_badge": "Absence Justifiée"
+  "absent_badge": "Absence Justifiée",
+  "cancel_btn": "Annuler",
+  "save_btn": "Enregistrer",
+  "admin_dashboard_title": "Tableau de Bord Super Admin",
+  "admin_dashboard_subtitle": "Statistiques globales, présences, finances et flux d'activités.",
+  "total_teachers": "Total Enseignants",
+  "daily_attendance": "Présence d'Aujourd'hui",
+  "monthly_revenue": "Taux de Recouvrement Mensuel",
+  "attendance_trend": "Taux de Présence (30 derniers jours)",
+  "finance_overview": "Recouvrement vs Impayés (6 derniers mois)",
+  "grade_distribution": "Moyennes et Extrêmes des Notes par Matière",
+  "upcoming_exams": "Examens à Venir",
+  "recent_activities": "Logs Système & Flux d'Activité"
 }

@@ -37,6 +37,31 @@ class TeacherController extends Controller
         return response()->json(['data' => TeacherResource::collection($teachers)]);
     }
 
+    public function me(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $teacher = \App\Models\Enseignant::where('user_id', $user->id)
+            ->where('etablissement_id', $user->etablissement_id)
+            ->firstOrFail();
+
+        // Resolve matiere by matching specialite name — this is always correct
+        $matiere = \App\Models\Matiere::where('nom', $teacher->specialite)
+            ->where('etablissement_id', $user->etablissement_id)
+            ->first();
+
+        $matieres = $matiere
+            ? [['matiere_id' => $matiere->id, 'matiere_nom' => $matiere->nom]]
+            : [];
+
+        return response()->json([
+            'data' => [
+                'enseignant_id' => $teacher->id,
+                'specialite'    => $teacher->specialite,
+                'matieres'      => $matieres,
+            ]
+        ]);
+    }
+
     public function store(TeacherRequest $request): JsonResponse
     {
         $teacher = $this->createTeacherUseCase->execute($request->validated());

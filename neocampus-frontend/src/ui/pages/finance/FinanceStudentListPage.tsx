@@ -4,6 +4,8 @@ import { useStudent } from '@/application/useCases/useStudent';
 import { useFinance } from '@/application/useCases/useFinance';
 import { useClass } from '@/application/useCases/useClass';
 import { Search, ChevronRight, AlertTriangle, CheckCircle, CreditCard } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/ui/components/EmptyState';
 
 export const FinanceStudentListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -167,9 +169,41 @@ export const FinanceStudentListPage: React.FC = () => {
       {/* Main List */}
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
         {loadingStudents ? (
-          <div className="p-12 text-center text-neutral-500">Loading student directory...</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-neutral-50 text-neutral-500 font-bold text-xs uppercase border-b border-neutral-100">
+                  <th className="p-4 pl-6">Student</th>
+                  <th className="p-4">Matricule</th>
+                  <th className="p-4">Class</th>
+                  <th className="p-4">Total Fee</th>
+                  <th className="p-4">Total Paid</th>
+                  <th className="p-4">Balance Due</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4 text-center pr-6">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 text-sm">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={idx}>
+                    <td className="p-4 pl-6"><Skeleton className="h-4 w-32" /></td>
+                    <td className="p-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                    <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                    <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                    <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                    <td className="p-4"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                    <td className="p-4 pr-6 text-center"><Skeleton className="h-8 w-24 rounded-lg mx-auto" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="p-12 text-center text-neutral-400">No students found matching your filters.</div>
+          <EmptyState
+            title="No Students Found"
+            description="No directory profiles match the keywords or filters you set."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">

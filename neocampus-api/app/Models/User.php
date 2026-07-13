@@ -40,4 +40,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Etablissement::class);
     }
+
+    /**
+     * Get the children linked to this parent.
+     */
+    public function children(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Eleve::class, 'parent_eleve', 'parent_user_id', 'eleve_id')
+            ->withPivot('relation')
+            ->withTimestamps();
+    }
 }

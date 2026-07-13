@@ -69,12 +69,18 @@ class TeacherSeeder extends Seeder
                     'matiere_id' => $subject->id,
                     'classe_id' => $class1->id,
                 ]);
+                $class1->matieres()->syncWithoutDetaching([
+                    $subject->id => ['etablissement_id' => $etablissement->id]
+                ]);
 
                 $class2 = $classes[($i + 1) % $classes->count()];
                 ChargeHoraire::create([
                     'enseignant_id' => $teacher->id,
                     'matiere_id' => $subject->id,
                     'classe_id' => $class2->id,
+                ]);
+                $class2->matieres()->syncWithoutDetaching([
+                    $subject->id => ['etablissement_id' => $etablissement->id]
                 ]);
             }
 

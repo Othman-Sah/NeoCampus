@@ -1,4 +1,5 @@
 import React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/application/stores/authStore'
 import { Card } from '@/components/ui/card'
 import AdminDashboard from './AdminDashboard'
@@ -81,7 +82,7 @@ export const DashboardPage: React.FC = () => {
   // Route to specific dashboard components based on user role
   switch (user.role) {
     case 'admin':
-      return <AdminDashboard language={language} MiniCalendar={MiniCalendar} />
+      return <Navigate to="/admin/dashboard" replace />
     case 'comptable':
       return <FinanceDashboard language={language} MiniCalendar={MiniCalendar} />
     case 'enseignant':

@@ -63,6 +63,12 @@ class DatabaseSeeder extends Seeder
             FinanceSeeder::class,
             LibrarySeeder::class,
             TypeEvaluationSeeder::class,
+            TransportSeeder::class,
+            AnnouncementSeeder::class,
+            NotificationSeeder::class,
+            ParentStudentSeeder::class,
+            CourseMaterialSeeder::class,
+            AdminDashboardStatsSeeder::class,
         ]);
     }
 }

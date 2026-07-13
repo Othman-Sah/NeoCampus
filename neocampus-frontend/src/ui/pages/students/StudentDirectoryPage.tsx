@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStudent } from '@/application/useCases/useStudent'
+import { useClass } from '@/application/useCases/useClass'
 import { Student } from '@/domain/ports/IStudentService'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,8 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import EmptyState from '@/ui/components/EmptyState'
 import { 
   Search, 
   UserPlus, 
@@ -75,6 +78,8 @@ export const StudentDirectoryPage: React.FC = () => {
     deleting, 
     deleteStudent 
   } = useStudent(filters)
+
+  const { classes: dbClasses } = useClass()
 
   // 5. Pagination calculation
   const itemsPerPage = 10
@@ -212,9 +217,9 @@ export const StudentDirectoryPage: React.FC = () => {
               className="bg-white border border-[#e5e7eb] text-neutral-900 rounded-lg text-xs h-9 px-3 outline-none cursor-pointer focus:border-black"
             >
               <option value="">Class (All)</option>
-              {mockClasses.map((cls) => (
+              {dbClasses.map((cls) => (
                 <option key={cls.id} value={cls.id}>
-                  {cls.name}
+                  {cls.nom}
                 </option>
               ))}
             </select>
@@ -249,22 +254,73 @@ export const StudentDirectoryPage: React.FC = () => {
       {/* Main Table / Directory List */}
       <Card className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="h-7 w-7 text-black animate-spin" />
-            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-              Fetching directory entries...
-            </p>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-[#f9f9f9] border-b border-[#e5e7eb]">
+                <TableRow className="border-b border-[#e5e7eb] hover:bg-transparent">
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase pl-6 py-3.5">
+                    Photo
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase py-3.5">
+                    Matricule
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase py-3.5">
+                    Full Name
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase py-3.5">
+                    Class
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase py-3.5">
+                    Section
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase py-3.5">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase pr-6 py-3.5 text-right">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx} className="border-b border-[#e5e7eb]/80">
+                    <TableCell className="pl-6 py-3">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </TableCell>
+                    <TableCell className="pr-6 py-3 text-right">
+                      <div className="flex gap-2 justify-end">
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         ) : paginatedStudents.length === 0 ? (
-          <div className="text-center py-16 space-y-2">
-            <FilterX className="h-8 w-8 text-neutral-300 mx-auto" />
-            <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-              No Students Found
-            </h3>
-            <p className="text-[11px] text-neutral-400 font-semibold max-w-xs mx-auto leading-relaxed">
-              No directory profiles match the keywords or filters you set.
-            </p>
-          </div>
+          <EmptyState
+            title="No Students Found"
+            description="No directory profiles match the keywords or filters you set."
+            actionText="Enroll Student"
+            onAction={() => navigate('/admin/students/create')}
+          />
         ) : (
           <div className="overflow-x-auto">
             <Table>
@@ -295,7 +351,7 @@ export const StudentDirectoryPage: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {paginatedStudents.map((student: Student) => {
-                  const studentClassNom = mockClasses.find(c => c.id === student.classe_id)?.name ?? student.classe_nom ?? 'N/A'
+                  const studentClassNom = student.classe_nom ?? 'N/A'
                   const isPrimary = student.classe_id === 5
                   const sectionName = isPrimary ? 'Primary' : 'College'
 
