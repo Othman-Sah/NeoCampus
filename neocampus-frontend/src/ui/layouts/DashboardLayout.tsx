@@ -30,6 +30,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { NotificationBell } from '@/ui/components/NotificationBell'
 import { ChatbotWidget } from '@/ui/components/ChatbotWidget'
+import DevelopmentGate from '@/ui/components/DevelopmentGate'
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -198,6 +199,7 @@ export const DashboardLayout: React.FC = () => {
   const location = useLocation()
 
   const [selectedChildId, setSelectedChildId] = useState<string | null>(localStorage.getItem('selected_child_id'))
+  const [logoClicks, setLogoClicks] = useState(0)
 
   useEffect(() => {
     const handleChildChanged = () => {
@@ -352,7 +354,19 @@ export const DashboardLayout: React.FC = () => {
         <div className="w-full h-16 flex items-center justify-between shrink-0 mb-6 bg-transparent z-30">
           <div className="flex items-center gap-4">
             {/* School Name: All caps, tracking-wider, font-black, larger (text-base) */}
-            <h2 className="text-base font-black text-neutral-900 tracking-wider uppercase">
+            <h2 
+              onClick={() => {
+                setLogoClicks(prev => {
+                  const next = prev + 1
+                  if (next >= 5) {
+                    navigate('/dev-control')
+                    return 0
+                  }
+                  return next
+                })
+              }}
+              className="text-base font-black text-neutral-900 tracking-wider uppercase cursor-pointer select-none"
+            >
               GROUPE SCOLAIRE EMSI
             </h2>
           </div>
@@ -451,7 +465,7 @@ export const DashboardLayout: React.FC = () => {
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 className="h-full"
               >
-                <Outlet />
+                <DevelopmentGate />
               </motion.div>
             </AnimatePresence>
           </div>

@@ -49,6 +49,8 @@ import TransportPage from '@/ui/pages/transport/TransportPage'
 import { FullscreenTrackingPage } from '@/ui/pages/transport/FullscreenTrackingPage'
 import DriverDashboardPage from '@/ui/pages/driver/DriverDashboardPage'
 import AnnouncementFeedPage from '@/ui/pages/announcements/AnnouncementFeedPage'
+import DevControlPanel from '@/ui/pages/development/DevControlPanel'
+import DevelopmentGate from '@/ui/components/DevelopmentGate'
 
 // Parent Portal Pages
 import ParentChildGradesPage from '@/ui/pages/parent/ParentChildGradesPage'
@@ -83,6 +85,7 @@ export const App: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dev-control" element={<DevControlPanel />} />
             <Route path="/timetable" element={<TimetablePage />} />
             <Route path="/attendance" element={<AttendanceDashboardPage />} />
             <Route path="/grades" element={<GradesDashboardPage />} />
@@ -121,7 +124,9 @@ export const App: React.FC = () => {
              <Route path="/admin/exams" element={<AdminExamManagementPage />} />
              <Route path="/bulletins/settings" element={<BulletinSettingsPage />} />
           </Route>
-          <Route path="/admin/transport/tracking" element={<FullscreenTrackingPage />} />
+          <Route element={<DevelopmentGate />}>
+            <Route path="/admin/transport/tracking" element={<FullscreenTrackingPage />} />
+          </Route>
         </Route>
 
         {/* Finance-only Routes */}
