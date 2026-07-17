@@ -38,6 +38,11 @@ class BulletinPolicy
             if (!$student) {
                 return false;
             }
+            // Check direct database relationship first
+            if ($student->parents()->where('parent_user_id', $user->id)->exists()) {
+                return true;
+            }
+            // Fallback to matching email from parent_contact JSON field
             $parentEmail = strtolower($user->email);
             $studentParentEmail = isset($student->parent_contact['email']) ? strtolower($student->parent_contact['email']) : null;
             return $studentParentEmail === $parentEmail;

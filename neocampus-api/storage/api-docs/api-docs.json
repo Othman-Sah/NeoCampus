@@ -25,6 +25,159 @@
                     }
                 }
             }
+        },
+        "/api/admin/eleves": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Search and filter students with tenant isolation",
+                "operationId": "bf10c21742122c2865c47f6fbd509dbf",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name or matricule",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "classe_id",
+                        "in": "query",
+                        "description": "Filter by class ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "section",
+                        "in": "query",
+                        "description": "Filter by section name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of students"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Enroll a new student",
+                "operationId": "f438b49dbbc088714810d7d59ba4b67c",
+                "responses": {
+                    "201": {
+                        "description": "Student created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/admin/eleves/{id}": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student details by ID",
+                "operationId": "889dc6e5add56100b6b50f1a4d2f8c61",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Student ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student details"
+                    },
+                    "404": {
+                        "description": "Student not found or tenant mismatch"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Update student details",
+                "operationId": "f18e8388bca2502f20bf84e38fb3784d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Student ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student updated successfully"
+                    },
+                    "404": {
+                        "description": "Student not found or tenant mismatch"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete student and credentials",
+                "operationId": "ad4e5975d9f36c63894c5f0518fa6418",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Student ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student deleted successfully"
+                    },
+                    "404": {
+                        "description": "Student not found or tenant mismatch"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -36,5 +189,11 @@
                 "in": "header"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Students",
+            "description": "Students"
+        }
+    ]
 }

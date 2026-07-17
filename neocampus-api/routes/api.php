@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public Authentication
-Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:60,1');
 
-// Authenticated Routes (Tenant Isolated)
-Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
+// Authenticated Routes (Tenant Isolated & Rate limited)
+Route::middleware(['auth:sanctum', 'tenant', 'throttle:600,1'])->group(function () {
     
     // Auth actions
     Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
@@ -251,8 +251,8 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
         Route::delete('/devoirs/{id}', [\App\Http\Controllers\Api\CourseMaterialController::class, 'destroyHomework']);
     });
 
-    // Chatbot (Common to Eleve, Parent, etc.)
-    Route::middleware('role:eleve,parent,enseignant,admin')->prefix('chatbot')->group(function () {
+    // Chatbot (Common to Eleve, Parent, etc. & Rate limited)
+    Route::middleware(['role:eleve,parent,enseignant,admin', 'throttle:20,1'])->prefix('chatbot')->group(function () {
         Route::post('/message', [\App\Http\Controllers\Api\ChatbotController::class, 'message']);
         Route::get('/history', [\App\Http\Controllers\Api\ChatbotController::class, 'history']);
     });

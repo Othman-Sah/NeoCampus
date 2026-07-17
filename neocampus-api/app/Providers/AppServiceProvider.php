@@ -59,11 +59,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Frais::class, \App\Policies\FinancePolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Paiement::class, \App\Policies\FinancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Paiement::class, \App\Policies\PaiementPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Solde::class, \App\Policies\FinancePolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\GroupeFrais::class, \App\Policies\FinancePolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\TypeFrais::class, \App\Policies\FinancePolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\RecetteDepense::class, \App\Policies\FinancePolicy::class);
+
+        // Student Policy
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Eleve::class, \App\Policies\ElevePolicy::class);
 
         // Library Policy
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Livre::class, \App\Policies\LibraryPolicy::class);

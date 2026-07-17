@@ -17,7 +17,7 @@ class TeacherRequest extends FormRequest
             'nom' => 'required_without:id|string|max:255',
             'prenom' => 'required_without:id|string|max:255',
             'email' => 'required_without:id|email|max:255',
-            'password' => 'nullable|string|min:6',
+            'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()],
             'specialite' => 'required|string|max:255',
             'salaire_de_base' => 'nullable|numeric|min:0',
             'avatar' => 'nullable|string',

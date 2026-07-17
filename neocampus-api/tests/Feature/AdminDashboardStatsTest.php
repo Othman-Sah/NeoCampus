@@ -96,10 +96,14 @@ class AdminDashboardStatsTest extends TestCase
         $anneeA = AnneeScolaire::create([
             'etablissement_id' => $this->etablissementA->id,
             'libelle' => '2025/2026',
+            'date_debut' => '2025-09-01',
+            'date_fin' => '2026-06-30',
         ]);
         $anneeB = AnneeScolaire::create([
             'etablissement_id' => $this->etablissementB->id,
             'libelle' => '2025/2026',
+            'date_debut' => '2025-09-01',
+            'date_fin' => '2026-06-30',
         ]);
 
         $sectionA = Section::create([

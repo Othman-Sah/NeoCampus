@@ -25,7 +25,7 @@ class StudentRequest extends FormRequest
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . ($id ? $this->getUserIdFromStudent($id) : 'NULL') . ',id',
-            'password' => 'nullable|string|max:8',
+            'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->numbers()],
             'matricule' => 'nullable|string|max:100',
             'classe_id' => 'nullable|integer',
             'classe_nom' => 'nullable|string|max:255',

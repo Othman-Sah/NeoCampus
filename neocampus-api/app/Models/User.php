@@ -12,13 +12,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Traits\Multitenant;
 
 #[Fillable(['etablissement_id', 'nom', 'prenom', 'email', 'password', 'role', 'avatar', 'temp_password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, Multitenant;
 
     /**
      * Get the attributes that should be cast.
