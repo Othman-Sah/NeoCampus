@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '@/application/stores/authStore'
+import { useBranchStore } from '@/application/stores/branchStore'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 
@@ -11,13 +12,19 @@ export const axiosClient = axios.create({
   },
 })
 
-// Request Interceptor: Attach Sanctum Bearer Token
+// Request Interceptor: Attach Sanctum Bearer Token & Branch Context
 axiosClient.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    const activeBranchId = useBranchStore.getState().activeBranchId
+    if (activeBranchId && config.headers) {
+      config.headers['X-Branch-ID'] = activeBranchId
+    }
+
     return config
   },
   (error) => Promise.reject(error)

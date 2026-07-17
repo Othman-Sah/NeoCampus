@@ -6,9 +6,11 @@ use App\Models\Traits\Multitenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\Traits\BranchScoped;
+
 class Paiement extends Model
 {
-    use Multitenant;
+    use Multitenant, BranchScoped;
 
     protected $table = 'paiements';
 
@@ -20,6 +22,7 @@ class Paiement extends Model
         'reference',
         'comptable_id',
         'etablissement_id',
+        'succursale_id',
     ];
 
     public function frais(): BelongsTo

@@ -51,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Chatbot Binding
         $this->app->bind(\App\Domain\Ports\ChatbotPortInterface::class, \App\Infrastructure\External\LLMAdapter::class);
+
+        // Stripe Subscription Billing Binding
+        $this->app->bind(\App\Domain\Ports\SubscriptionPortInterface::class, \App\Infrastructure\External\StripeSubscriptionAdapter::class);
     }
 
     /**

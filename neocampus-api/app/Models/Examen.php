@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'date',
     'intitule',
@@ -18,12 +20,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'periode',
     'fichier_sujet',
     'etablissement_id',
+    'succursale_id',
     'type_evaluation_id',
     'poids'
 ])]
 class Examen extends Model
 {
-    use HasFactory, Multitenant;
+    use HasFactory, Multitenant, BranchScoped;
 
     protected $table = 'examens';
 

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'jour',
     'heure_debut',
@@ -15,11 +17,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'classe_id',
     'enseignant_id',
     'matiere_id',
-    'etablissement_id'
+    'etablissement_id',
+    'succursale_id'
 ])]
 class Seance extends Model
 {
-    use HasFactory, Multitenant;
+    use HasFactory, Multitenant, BranchScoped;
 
     protected $table = 'seances';
 

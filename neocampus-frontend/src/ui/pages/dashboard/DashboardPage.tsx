@@ -83,6 +83,8 @@ export const DashboardPage: React.FC = () => {
   switch (user.role) {
     case 'admin':
       return <Navigate to="/admin/dashboard" replace />
+    case 'super-admin':
+      return <Navigate to="/super-admin" replace />
     case 'comptable':
       return <FinanceDashboard language={language} MiniCalendar={MiniCalendar} />
     case 'enseignant':

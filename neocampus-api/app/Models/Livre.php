@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Traits\BranchScoped;
+
 class Livre extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BranchScoped;
 
     protected $table = 'livres';
 
@@ -23,6 +25,7 @@ class Livre extends Model
         'genre',
         'quantite_stock',
         'etablissement_id',
+        'succursale_id',
     ];
 
     /**

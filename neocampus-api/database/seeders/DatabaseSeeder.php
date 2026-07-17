@@ -36,6 +36,18 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 2.5. Create the test Super Admin account
+        User::firstOrCreate(
+            ['email' => 'superadmin@neocampus.com'],
+            [
+                'etablissement_id' => $etablissement->id,
+                'nom' => 'System',
+                'prenom' => 'SuperAdmin',
+                'password' => Hash::make('password123'),
+                'role' => 'super-admin',
+            ]
+        );
+
         // 3. Create the other test accounts for mock login
         $roles = ['comptable', 'enseignant', 'bibliothecaire', 'parent', 'eleve'];
         foreach ($roles as $role) {

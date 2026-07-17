@@ -40,6 +40,14 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
 
+// SaaS Overhaul imports
+import { useBranchStore } from '@/application/stores/branchStore'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { axiosClient } from '@/infrastructure/api/axiosClient'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 interface SubMenuItem {
   nameKey: TranslationKey;
   path: string;
@@ -201,6 +209,42 @@ export const DashboardLayout: React.FC = () => {
   const [selectedChildId, setSelectedChildId] = useState<string | null>(localStorage.getItem('selected_child_id'))
   const [logoClicks, setLogoClicks] = useState(0)
 
+  // SaaS Overhaul: Branch selection and Query invalidation
+  const queryClient = useQueryClient()
+  const { activeBranchId, setActiveBranch, setBranches, branches } = useBranchStore()
+
+  // Fetch branches only if user is establishment admin
+  const { data: fetchedBranches } = useQuery({
+    queryKey: ['my-branches'],
+    queryFn: async () => {
+      const res = await axiosClient.get('/admin/branches')
+      return res.data
+    },
+    enabled: user?.role === 'admin',
+  })
+
+  // Synchronize store branches
+  useEffect(() => {
+    if (fetchedBranches) {
+      setBranches(fetchedBranches)
+      if (!activeBranchId && fetchedBranches.length > 0) {
+        setActiveBranch(fetchedBranches[0].id.toString())
+      }
+    }
+  }, [fetchedBranches, activeBranchId, setBranches, setActiveBranch])
+
+  const handleBranchChange = (branchId: string) => {
+    setActiveBranch(branchId)
+    // Smoothly reload queries
+    queryClient.invalidateQueries()
+  }
+
+  // Etablissement details
+  const activeUser = user
+  const etablissement = activeUser?.etablissement
+  const planTier = etablissement?.plan_tier ?? 'free'
+  const subStatus = etablissement?.subscription_status ?? 'trialing'
+
   useEffect(() => {
     const handleChildChanged = () => {
       setSelectedChildId(localStorage.getItem('selected_child_id'))
@@ -350,6 +394,48 @@ export const DashboardLayout: React.FC = () => {
       {/* Main Content Area (Scrolls naturally) */}
       <div className="flex-1 flex flex-col min-w-0 ml-28 h-screen overflow-y-auto bg-[#f9f9f9] px-8 pt-4 pb-8">
         
+        {/* Amber Warning Header Alert for past_due */}
+        {subStatus === 'past_due' && (
+          <div className="bg-amber-500 text-black py-2.5 px-4 mb-4 rounded-xl font-bold text-xs flex items-center justify-between shadow-sm animate-pulse shrink-0">
+            <span>⚠️ Warning: Your subscription payment failed. Please resolve the issue to avoid service interruption.</span>
+            <Link to="/settings/billing" className="underline font-black hover:text-neutral-800 ml-2">Resolve Account</Link>
+          </div>
+        )}
+
+        {/* Red Full-screen Restrictor Modal for canceled */}
+        {subStatus === 'canceled' && (
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-6 text-white text-center">
+            <div className="max-w-md space-y-6">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto text-white text-2xl font-bold">
+                ✕
+              </div>
+              <h2 className="text-2xl font-black uppercase tracking-tight">RESTRICTED ACCESS — SUBSCRIPTION CANCELED</h2>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Access to your institution has been suspended due to payment failure. Please resolve the issue to restore access to your data.
+              </p>
+              <div className="flex flex-col gap-3">
+                <Button 
+                  onClick={async () => {
+                    const res = await axiosClient.get('/billing/portal')
+                    if (res.data?.url) {
+                      window.location.href = res.data.url
+                    }
+                  }}
+                  className="bg-[#d0f137] text-black font-extrabold hover:bg-[#b8d62c] rounded-xl py-6 cursor-pointer"
+                >
+                  Access Stripe Portal
+                </Button>
+                <button 
+                  onClick={handleLogout}
+                  className="text-xs text-red-400 hover:text-red-300 underline font-semibold mt-2 cursor-pointer border-none bg-transparent"
+                >
+                  Log Out
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Top Header widgets (Scrolls with page, normal block flow, h-16) */}
         <div className="w-full h-16 flex items-center justify-between shrink-0 mb-6 bg-transparent z-30">
           <div className="flex items-center gap-4">
@@ -365,10 +451,34 @@ export const DashboardLayout: React.FC = () => {
                   return next
                 })
               }}
-              className="text-base font-black text-neutral-900 tracking-wider uppercase cursor-pointer select-none"
+              className="text-base font-black text-neutral-900 tracking-wider uppercase cursor-pointer select-none shrink-0"
             >
-              GROUPE SCOLAIRE EMSI
+              {etablissement?.nom ?? 'GROUPE SCOLAIRE EMSI'}
             </h2>
+
+            {/* Branch Switcher (only for establishment admin role: 'admin') */}
+            {user.role === 'admin' && branches.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Select value={activeBranchId || ''} onValueChange={handleBranchChange}>
+                  <SelectTrigger className="w-48 h-8 text-xs font-extrabold rounded-xl bg-white border border-neutral-100 shadow-sm cursor-pointer focus:outline-none">
+                    <SelectValue placeholder="Select a branch" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-neutral-100">
+                    {branches.map(b => (
+                      <SelectItem key={b.id} value={b.id.toString()} className="text-xs font-bold cursor-pointer">
+                        {b.nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {activeBranchId && (
+                  <Badge className="bg-[#d0f137] text-black font-extrabold text-[9px] tracking-tight border-none py-1">
+                    {branches.find(b => b.id.toString() === activeBranchId)?.nom ?? 'Branch'}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Action Tools & User Profile */}

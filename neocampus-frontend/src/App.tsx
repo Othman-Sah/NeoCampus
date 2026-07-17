@@ -52,6 +52,10 @@ import AnnouncementFeedPage from '@/ui/pages/announcements/AnnouncementFeedPage'
 import DevControlPanel from '@/ui/pages/development/DevControlPanel'
 import DevelopmentGate from '@/ui/components/DevelopmentGate'
 
+// SaaS Overhaul Pages
+import SuperAdminDashboard from '@/ui/pages/super-admin/SuperAdminDashboard'
+import BillingPage from '@/ui/pages/settings/BillingPage'
+
 // Parent Portal Pages
 import ParentChildGradesPage from '@/ui/pages/parent/ParentChildGradesPage'
 import ParentChildAttendancePage from '@/ui/pages/parent/ParentChildAttendancePage'
@@ -123,9 +127,17 @@ export const App: React.FC = () => {
              <Route path="/admin/classes/:id" element={<ClassDetailsPage />} />
              <Route path="/admin/exams" element={<AdminExamManagementPage />} />
              <Route path="/bulletins/settings" element={<BulletinSettingsPage />} />
+             <Route path="/settings/billing" element={<BillingPage />} />
           </Route>
           <Route element={<DevelopmentGate />}>
             <Route path="/admin/transport/tracking" element={<FullscreenTrackingPage />} />
+          </Route>
+        </Route>
+
+        {/* Super Admin-only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['super-admin']} />}>
+          <Route element={<DashboardLayout />}>
+             <Route path="/super-admin" element={<SuperAdminDashboard />} />
           </Route>
         </Route>
 

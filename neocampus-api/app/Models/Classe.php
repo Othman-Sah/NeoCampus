@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'etablissement_id',
+    'succursale_id',
     'nom',
     'niveau',
     'section_id',
@@ -19,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 ])]
 class Classe extends Model
 {
-    use HasFactory;
+    use HasFactory, BranchScoped;
 
     protected $table = 'classes';
 

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'seance_id',
     'eleve_id',
@@ -15,11 +17,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'motif',
     'date',
     'etablissement_id',
+    'succursale_id',
     'justifie'
 ])]
 class Presence extends Model
 {
-    use HasFactory, Multitenant;
+    use HasFactory, Multitenant, BranchScoped;
 
     protected $table = 'presences';
 

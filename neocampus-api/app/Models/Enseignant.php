@@ -10,15 +10,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'etablissement_id',
+    'succursale_id',
     'user_id',
     'specialite',
     'salaire_de_base'
 ])]
 class Enseignant extends Model
 {
-    use HasFactory;
+    use HasFactory, BranchScoped;
 
     protected $table = 'enseignants';
 

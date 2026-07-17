@@ -24,6 +24,21 @@ class EloquentAuthRepository implements AuthPortInterface
         // Generate Sanctum token
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Eager load establishment
+        $user->load('etablissement');
+
+        $etablissementData = null;
+        if ($user->etablissement) {
+            $etablissementData = [
+                'id' => $user->etablissement->id,
+                'nom' => $user->etablissement->nom,
+                'plan_tier' => $user->etablissement->plan_tier,
+                'subscription_status' => $user->etablissement->subscription_status,
+                'trial_ends_at' => $user->etablissement->trial_ends_at ? $user->etablissement->trial_ends_at->toIso8601String() : null,
+                'subscription_ends_at' => $user->etablissement->subscription_ends_at ? $user->etablissement->subscription_ends_at->toIso8601String() : null,
+            ];
+        }
+
         $userDTO = new UserDTO(
             $user->id,
             $user->etablissement_id,
@@ -31,7 +46,9 @@ class EloquentAuthRepository implements AuthPortInterface
             $user->prenom,
             $user->email,
             $user->role,
-            $user->avatar
+            $user->avatar,
+            $user->succursale_id,
+            $etablissementData
         );
 
         return new TokenDTO($token, 'Bearer', $userDTO);
@@ -48,7 +65,19 @@ class EloquentAuthRepository implements AuthPortInterface
 
     public function me(int $userId): UserDTO
     {
-        $user = User::findOrFail($userId);
+        $user = User::with('etablissement')->findOrFail($userId);
+
+        $etablissementData = null;
+        if ($user->etablissement) {
+            $etablissementData = [
+                'id' => $user->etablissement->id,
+                'nom' => $user->etablissement->nom,
+                'plan_tier' => $user->etablissement->plan_tier,
+                'subscription_status' => $user->etablissement->subscription_status,
+                'trial_ends_at' => $user->etablissement->trial_ends_at ? $user->etablissement->trial_ends_at->toIso8601String() : null,
+                'subscription_ends_at' => $user->etablissement->subscription_ends_at ? $user->etablissement->subscription_ends_at->toIso8601String() : null,
+            ];
+        }
 
         return new UserDTO(
             $user->id,
@@ -57,7 +86,9 @@ class EloquentAuthRepository implements AuthPortInterface
             $user->prenom,
             $user->email,
             $user->role,
-            $user->avatar
+            $user->avatar,
+            $user->succursale_id,
+            $etablissementData
         );
     }
 }

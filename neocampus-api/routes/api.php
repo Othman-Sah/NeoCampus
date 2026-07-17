@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Route;
 // Public Authentication
 Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:60,1');
 
-// Authenticated Routes (Tenant Isolated & Rate limited)
-Route::middleware(['auth:sanctum', 'tenant', 'throttle:600,1'])->group(function () {
+// Authenticated Routes (Tenant Isolated, Subscription Gated & Rate limited)
+Route::middleware(['auth:sanctum', 'tenant', 'subscription', 'throttle:600,1'])->group(function () {
     
     // Auth actions
     Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:600,1'])->group(function 
 
     // Admin-only Write Routes
     Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::get('branches', [\App\Http\Controllers\Api\BranchController::class, 'index']);
         Route::post('/eleves/{id}/avatar', [\App\Http\Controllers\Api\StudentController::class, 'uploadAvatar']);
         Route::post('/eleves/{id}/reveal-password', [\App\Http\Controllers\Api\StudentController::class, 'revealPassword']);
         Route::put('/eleves/{id}/password', [\App\Http\Controllers\Api\StudentController::class, 'updatePassword']);
@@ -319,4 +320,26 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:600,1'])->group(function 
         Route::get('recent-activities', [\App\Http\Controllers\Api\Admin\StatisticsController::class, 'recentActivities']);
     });
 });
+
+// --- SaaS Billing & Stripe Webhook Routes (Outside Tenant Subscription Gate) ---
+Route::post('/billing/webhook', [\App\Http\Controllers\Api\BillingController::class, 'webhook']);
+Route::get('/billing/checkout-success', [\App\Http\Controllers\Api\BillingController::class, 'checkoutSuccess']);
+Route::post('/billing/stripe-webhook-simulate', [\App\Http\Controllers\Api\BillingController::class, 'simulateWebhook']);
+
+Route::middleware(['auth:sanctum', 'tenant'])->prefix('billing')->group(function () {
+    Route::post('/checkout', [\App\Http\Controllers\Api\BillingController::class, 'checkout']);
+    Route::get('/portal', [\App\Http\Controllers\Api\BillingController::class, 'portal']);
+});
+
+// --- Super Admin Portal Control Center (Outside Tenant Boundaries) ---
+Route::middleware(['auth:sanctum', 'super-admin'])->prefix('super-admin')->group(function () {
+    Route::get('/stats', [\App\Http\Controllers\Api\SuperAdminController::class, 'stats']);
+    Route::get('/tenants', [\App\Http\Controllers\Api\SuperAdminController::class, 'listTenants']);
+    Route::post('/tenants', [\App\Http\Controllers\Api\SuperAdminController::class, 'onboardTenant']);
+    Route::post('/tenants/{id}/subscription', [\App\Http\Controllers\Api\SuperAdminController::class, 'updateSubscription']);
+    Route::post('/tenants/{id}/limits', [\App\Http\Controllers\Api\SuperAdminController::class, 'updateLimits']);
+    Route::post('/impersonate', [\App\Http\Controllers\Api\SuperAdminController::class, 'impersonate']);
+    Route::get('/audit-logs', [\App\Http\Controllers\Api\SuperAdminController::class, 'auditLogs']);
+});
+
 

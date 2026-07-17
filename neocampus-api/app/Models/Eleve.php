@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'etablissement_id',
+    'succursale_id',
     'user_id',
     'matricule',
     'nom',
@@ -26,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class Eleve extends Model
 {
-    use HasFactory;
+    use HasFactory, BranchScoped;
 
     protected $casts = [
         'parent_contact' => 'array',

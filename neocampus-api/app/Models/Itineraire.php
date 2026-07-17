@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Models\Traits\BranchScoped;
+
 #[Fillable([
     'etablissement_id',
+    'succursale_id',
     'nom',
     'zone',
     'description',
@@ -22,7 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 ])]
 class Itineraire extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BranchScoped;
 
     protected $table = 'itineraires';
 
