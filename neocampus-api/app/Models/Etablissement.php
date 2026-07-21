@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Succursale;
 use App\Models\EtablissementSetting;
 use App\Models\Eleve;
+use App\Models\PlatformSetting;
 
 #[Fillable([
     'nom',
@@ -40,6 +41,14 @@ class Etablissement extends Model
     public function succursales(): HasMany
     {
         return $this->hasMany(Succursale::class);
+    }
+
+    /**
+     * Get the students registered under this establishment.
+     */
+    public function eleves(): HasMany
+    {
+        return $this->hasMany(Eleve::class);
     }
 
     /**
@@ -99,17 +108,30 @@ class Etablissement extends Model
         return $count >= $limit;
     }
 
+    private function getPlansConfig(): array
+    {
+        try {
+            $setting = PlatformSetting::where('key', 'plans')->first();
+            if ($setting) {
+                return $setting->value;
+            }
+        } catch (\Exception $e) {}
+
+        return [
+            'free' => ['price' => 0, 'max_branches' => 1, 'max_students' => 50],
+            'basic' => ['price' => 49, 'max_branches' => 1, 'max_students' => 200],
+            'premium' => ['price' => 99, 'max_branches' => 5, 'max_students' => 1000],
+            'enterprise' => ['price' => 199, 'max_branches' => 999, 'max_students' => 99999],
+        ];
+    }
+
     /**
      * Get default branch limit based on plan tier.
      */
     private function getDefaultBranchLimit(): int
     {
-        return match ($this->plan_tier) {
-            'free' => 1,
-            'basic' => 1,
-            'premium' => 5,
-            default => 1,
-        };
+        $plans = $this->getPlansConfig();
+        return (int) ($plans[$this->plan_tier]['max_branches'] ?? 1);
     }
 
     /**
@@ -117,12 +139,7 @@ class Etablissement extends Model
      */
     private function getDefaultStudentLimit(): int
     {
-        return match ($this->plan_tier) {
-            'free' => 50,
-            'basic' => 200,
-            'premium' => 1000,
-            default => 50,
-        };
+        $plans = $this->getPlansConfig();
+        return (int) ($plans[$this->plan_tier]['max_students'] ?? 50);
     }
 }
-

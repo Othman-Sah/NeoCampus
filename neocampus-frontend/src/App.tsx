@@ -54,6 +54,15 @@ import DevelopmentGate from '@/ui/components/DevelopmentGate'
 
 // SaaS Overhaul Pages
 import SuperAdminDashboard from '@/ui/pages/super-admin/SuperAdminDashboard'
+import TenantDirectoryPage from '@/ui/pages/super-admin/TenantDirectoryPage'
+import TenantDetailPage from '@/ui/pages/super-admin/TenantDetailPage'
+import UserDirectoryPage from '@/ui/pages/super-admin/UserDirectoryPage'
+import BillingRevenuePage from '@/ui/pages/super-admin/BillingRevenuePage'
+import AuditLogsPage from '@/ui/pages/super-admin/AuditLogsPage'
+import ImpersonationCenterPage from '@/ui/pages/super-admin/ImpersonationCenterPage'
+import PlatformConfigPage from '@/ui/pages/super-admin/PlatformConfigPage'
+import SystemHealthPage from '@/ui/pages/super-admin/SystemHealthPage'
+import TenantOnboardWizardPage from '@/ui/pages/super-admin/TenantOnboardWizardPage'
 import BillingPage from '@/ui/pages/settings/BillingPage'
 
 // Parent Portal Pages
@@ -138,6 +147,15 @@ export const App: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['super-admin']} />}>
           <Route element={<DashboardLayout />}>
              <Route path="/super-admin" element={<SuperAdminDashboard />} />
+             <Route path="/super-admin/tenants" element={<TenantDirectoryPage />} />
+             <Route path="/super-admin/tenants/onboard" element={<TenantOnboardWizardPage />} />
+             <Route path="/super-admin/tenants/:id" element={<TenantDetailPage />} />
+             <Route path="/super-admin/users" element={<UserDirectoryPage />} />
+             <Route path="/super-admin/billing" element={<BillingRevenuePage />} />
+             <Route path="/super-admin/audit" element={<AuditLogsPage />} />
+             <Route path="/super-admin/platform" element={<PlatformConfigPage />} />
+             <Route path="/super-admin/health" element={<SystemHealthPage />} />
+             <Route path="/super-admin/impersonate" element={<ImpersonationCenterPage />} />
           </Route>
         </Route>
 

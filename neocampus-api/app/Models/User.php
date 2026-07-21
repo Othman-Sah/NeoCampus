@@ -15,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Traits\Multitenant;
 use App\Models\Traits\BranchScoped;
 
-#[Fillable(['etablissement_id', 'succursale_id', 'nom', 'prenom', 'email', 'password', 'role', 'avatar', 'temp_password'])]
+#[Fillable(['etablissement_id', 'succursale_id', 'nom', 'prenom', 'email', 'password', 'role', 'avatar', 'temp_password', 'disabled_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,6 +32,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'disabled_at' => 'datetime',
         ];
     }
 

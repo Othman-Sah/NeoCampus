@@ -25,7 +25,12 @@ import {
   FileText,
   CreditCard,
   Coins,
-  Banknote
+  Banknote,
+  Building2,
+  FileLock2,
+  HeartPulse,
+  Shield,
+  UserSquare2
 } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { NotificationBell } from '@/ui/components/NotificationBell'
@@ -195,13 +200,24 @@ const getNavItemsForRole = (role: UserRole, selectedChildId: string | null): Nav
           ]
         }
       ];
+    case 'super-admin':
+      return [
+        { id: 'super-dashboard', nameKey: 'dashboard' as TranslationKey, icon: BarChart3, hasSubmenu: false, path: '/super-admin' },
+        { id: 'super-tenants', nameKey: 'school' as TranslationKey, icon: Building2, hasSubmenu: false, path: '/super-admin/tenants' },
+        { id: 'super-users', nameKey: 'users', icon: Users, hasSubmenu: false, path: '/super-admin/users' },
+        { id: 'super-billing', nameKey: 'submenu_finance', icon: CreditCard, hasSubmenu: false, path: '/super-admin/billing' },
+        { id: 'super-audit', nameKey: 'audit' as TranslationKey, icon: FileLock2, hasSubmenu: false, path: '/super-admin/audit' },
+        { id: 'super-platform', nameKey: 'settings', icon: Shield, hasSubmenu: false, path: '/super-admin/platform' },
+        { id: 'super-health', nameKey: 'health' as TranslationKey, icon: HeartPulse, hasSubmenu: false, path: '/super-admin/health' },
+        { id: 'super-impersonate', nameKey: 'impersonate' as TranslationKey, icon: UserSquare2, hasSubmenu: false, path: '/super-admin/impersonate' },
+      ];
     default:
       return [];
   }
 }
 
 export const DashboardLayout: React.FC = () => {
-  const { user, logout } = useAuthStore()
+  const { user, logout, stopImpersonation, impersonatedUser, originalUser } = useAuthStore()
   const { t, setLanguage } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -258,6 +274,15 @@ export const DashboardLayout: React.FC = () => {
   const handleLogout = () => {
     logout()
     navigate('/login')
+  }
+
+  const handleReturnToSuperAdmin = async () => {
+    try {
+      await axiosClient.post('/super-admin/stop-impersonation')
+    } finally {
+      stopImpersonation()
+      navigate('/super-admin')
+    }
   }
 
   // Get items list for current user role
@@ -393,6 +418,17 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Main Content Area (Scrolls naturally) */}
       <div className="flex-1 flex flex-col min-w-0 ml-28 h-screen overflow-y-auto bg-[#f9f9f9] px-8 pt-4 pb-8">
+        {impersonatedUser && originalUser && (
+          <div className="bg-black text-white py-2.5 px-4 mb-4 rounded-xl font-bold text-xs flex flex-col gap-2 shadow-sm shrink-0 md:flex-row md:items-center md:justify-between">
+            <span>
+              You are viewing as {impersonatedUser.prenom} {impersonatedUser.nom}
+              {impersonatedUser.etablissement?.nom ? ` at ${impersonatedUser.etablissement.nom}` : ''}.
+            </span>
+            <Button onClick={handleReturnToSuperAdmin} className="bg-[#d0f137] text-black hover:bg-[#b8d62c] h-8 rounded-lg text-xs font-black">
+              Return to Super Admin
+            </Button>
+          </div>
+        )}
         
         {/* Amber Warning Header Alert for past_due */}
         {subStatus === 'past_due' && (

@@ -21,6 +21,12 @@ class EloquentAuthRepository implements AuthPortInterface
             ]);
         }
 
+        if ($user->disabled_at) {
+            throw ValidationException::withMessages([
+                'email' => ['Ce compte a été désactivé.'],
+            ]);
+        }
+
         // Generate Sanctum token
         $token = $user->createToken('auth_token')->plainTextToken;
 

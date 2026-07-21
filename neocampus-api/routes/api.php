@@ -334,12 +334,25 @@ Route::middleware(['auth:sanctum', 'tenant'])->prefix('billing')->group(function
 // --- Super Admin Portal Control Center (Outside Tenant Boundaries) ---
 Route::middleware(['auth:sanctum', 'super-admin'])->prefix('super-admin')->group(function () {
     Route::get('/stats', [\App\Http\Controllers\Api\SuperAdminController::class, 'stats']);
+    Route::get('/stats/revenue-history', [\App\Http\Controllers\Api\SuperAdminController::class, 'revenueHistory']);
+    Route::get('/stats/growth-history', [\App\Http\Controllers\Api\SuperAdminController::class, 'growthHistory']);
+    Route::get('/billing/revenue', [\App\Http\Controllers\Api\SuperAdminController::class, 'billingRevenue']);
+    Route::get('/billing/events', [\App\Http\Controllers\Api\SuperAdminController::class, 'billingEvents']);
+    Route::get('/users', [\App\Http\Controllers\Api\SuperAdminController::class, 'listUsers']);
+    Route::post('/users/{id}/disable', [\App\Http\Controllers\Api\SuperAdminController::class, 'disableUser']);
+    Route::post('/users/{id}/enable', [\App\Http\Controllers\Api\SuperAdminController::class, 'enableUser']);
+    Route::post('/users/{id}/reset-password', [\App\Http\Controllers\Api\SuperAdminController::class, 'resetUserPassword']);
     Route::get('/tenants', [\App\Http\Controllers\Api\SuperAdminController::class, 'listTenants']);
+    Route::get('/tenants/{id}/detail', [\App\Http\Controllers\Api\SuperAdminController::class, 'tenantDetail']);
     Route::post('/tenants', [\App\Http\Controllers\Api\SuperAdminController::class, 'onboardTenant']);
     Route::post('/tenants/{id}/subscription', [\App\Http\Controllers\Api\SuperAdminController::class, 'updateSubscription']);
     Route::post('/tenants/{id}/limits', [\App\Http\Controllers\Api\SuperAdminController::class, 'updateLimits']);
     Route::post('/impersonate', [\App\Http\Controllers\Api\SuperAdminController::class, 'impersonate']);
+    Route::get('/impersonation-history', [\App\Http\Controllers\Api\SuperAdminController::class, 'impersonationHistory']);
     Route::get('/audit-logs', [\App\Http\Controllers\Api\SuperAdminController::class, 'auditLogs']);
+    Route::get('/platform/settings', [\App\Http\Controllers\Api\SuperAdminController::class, 'getPlatformSettings']);
+    Route::put('/platform/settings', [\App\Http\Controllers\Api\SuperAdminController::class, 'updatePlatformSettings']);
+    Route::get('/health', [\App\Http\Controllers\Api\SuperAdminController::class, 'health']);
 });
 
-
+Route::middleware(['auth:sanctum'])->post('/super-admin/stop-impersonation', [\App\Http\Controllers\Api\SuperAdminController::class, 'stopImpersonation']);
